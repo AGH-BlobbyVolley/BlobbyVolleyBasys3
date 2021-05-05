@@ -1,5 +1,5 @@
 set project LAB1
-set top_module vga_example
+set top_module blobby_volley
 set target xc7a35tcpg236-1
 set bitstream_file build/${project}.runs/impl_1/${top_module}.bit
 
@@ -40,7 +40,7 @@ read_xdc {
 }
 
 read_verilog {
-    rtl/vga_example.v
+    rtl/blobby_volley.v
     rtl/vga_timing.v
 	rtl/draw_background.v
 	rtl/reset.v
