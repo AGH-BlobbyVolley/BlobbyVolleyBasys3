@@ -1,0 +1,6 @@
+$ cat .gitignore
+build
+.Xil
+*.jou
+*.pdf
+*.log
