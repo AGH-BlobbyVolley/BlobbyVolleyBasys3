@@ -1,4 +1,4 @@
-set project LAB1
+set project Blobby_volley
 set top_module blobby_volley
 set target xc7a35tcpg236-1
 set bitstream_file build/${project}.runs/impl_1/${top_module}.bit
