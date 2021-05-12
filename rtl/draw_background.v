@@ -1,25 +1,23 @@
 `timescale 1 ns / 1 ps
 
+`include "_vga_macros.vh"
+
 module draw_background (
     input wire rst,
+    input wire pclk,
+    
     input wire [10:0] hcount_in,
     input wire hsync_in,
     input wire hblnk_in,
     input wire [10:0] vcount_in,
     input wire vsync_in,
     input wire vblnk_in,
-    input wire pclk,
-    output reg [10:0] hcount_out,
-    output reg hsync_out,
-    output reg hblnk_out,
-    output reg [10:0] vcount_out,
-    output reg vsync_out,
-    output reg vblnk_out,
-    output reg [11:0] rgb_out,
     
-    input wire [11:0] rgb_pixel,
-    output reg [19:0] pixel_addr
+    output wire [`VGA_BUS_SIZE-1:0] vga_out
   );
+
+`VGA_OUT_REG
+`VGA_MERGE_OUTPUT(vga_out)
 
 wire [10:0] hcount_buf;
 wire hsync_buf;
@@ -44,18 +42,18 @@ my_delay
 always @(posedge pclk) begin
 	if (rst) begin
 	hcount_out <= 0;
-	hsync_out <= 0;
+	hs_out <= 0;
 	hblnk_out <= 0;
 	vcount_out <= 0;
-	vsync_out <= 0;
+	vs_out <= 0;
 	vblnk_out <= 0;
 	end
 	else begin
 	hcount_out <= hcount_buf;
-	hsync_out <= hsync_buf;
+	hs_out <= hsync_buf;
 	hblnk_out <= hblnk_buf;
 	vcount_out <= vcount_buf;
-	vsync_out <= vsync_buf;
+	vs_out <= vsync_buf;
 	vblnk_out <= vblnk_buf;
 	end
 end
@@ -69,35 +67,20 @@ end
  
 always @* begin
 	if(hblnk_buf | vblnk_buf) rgb_out_nxt = 12'h0_0_0;
-	else rgb_out_nxt = rgb_pixel;
-end
-
-//generating pixel address
-
-reg [9:0] pixel_addrx_nxt, pixel_addry_nxt;
-
-always @* begin
-    if(hcount_in<=WIDTH && vcount_in<=HEIGHT)
-    begin
-       if(0 == vcount_in && 0 == hcount_in) {pixel_addry_nxt,pixel_addrx_nxt} = 20'b0;
-       else if(pixel_addr[9:0]<WIDTH) 
-       begin 
-           pixel_addrx_nxt = pixel_addr[9:0] + 1;
-           pixel_addry_nxt = pixel_addr[19:10];
-       end
-       else if((pixel_addr[19:10]<HEIGHT) && (pixel_addr[9:0]==WIDTH)) 
-       begin
-           pixel_addry_nxt = pixel_addr[19:10] + 1;
-           pixel_addrx_nxt = 0;
-       end
-       else {pixel_addry_nxt,pixel_addrx_nxt} = 20'b0;
-    end
-    else {pixel_addry_nxt,pixel_addrx_nxt} = pixel_addr;
-end
-
-always @(posedge pclk) begin
-    if(rst) pixel_addr <= 20'b0;
-    else  pixel_addr <= {pixel_addry_nxt, pixel_addrx_nxt};
+	else begin
+		if(vcount_in<=6 || (vcount_in>12 && vcount_in<=20)) rgb_out_nxt = 12'h3BE;
+		else if((vcount_in>6 && vcount_in<=12) || (vcount_in>20 && vcount_in<=28)) rgb_out_nxt = 12'h6CF;
+		else if((vcount_in>28 && vcount_in<=462) || (vcount_in>576 && vcount_in<=586)) rgb_out_nxt = 12'h7AD;
+		else if((vcount_in>462 && vcount_in<=474)) rgb_out_nxt = 12'hBDF;
+		else if((vcount_in>474 && vcount_in<=483)) rgb_out_nxt = 12'h05A;
+		else if((vcount_in>483 && vcount_in<=512)) rgb_out_nxt = 12'h28D;
+		else if((vcount_in>512 && vcount_in<=576)) rgb_out_nxt = 12'h9CE;
+		else if((vcount_in>586 && vcount_in<=594)) rgb_out_nxt = 12'hFFF;
+		else if((vcount_in>594 && vcount_in<=614)) rgb_out_nxt = 12'h974;
+		else if((vcount_in>614 && vcount_in<=670)) rgb_out_nxt = 12'hC96;
+		else rgb_out_nxt = 12'hEC9;
+	end
+	
 end
 
 endmodule

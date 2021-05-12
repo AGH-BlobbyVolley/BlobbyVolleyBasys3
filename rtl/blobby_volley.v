@@ -1,5 +1,6 @@
 `timescale 1 ns / 1 ps
 
+`include "_vga_macros.vh"
 
 module blobby_volley(
   input wire clk,
@@ -66,6 +67,8 @@ vga_timing my_timing (
 wire [19:0] pixel_addr;
 wire [11:0] rgb_pixel;
 
+wire [`VGA_BUS_SIZE-1:0] vga_out;
+
 draw_background my_draw_background (
   .rst(rst_d),
   .hcount_in(hcount),
@@ -75,22 +78,12 @@ draw_background my_draw_background (
   .vsync_in(vsync),
   .vblnk_in(vblnk),
   .pclk(clk65MHz),
-  .hsync_out(hs),
-  .hblnk_out(),
-  .hcount_out(),
-  .vsync_out(vs),
-  .vblnk_out(),
-  .vcount_out(),
-  .rgb_out({r,g,b}),
-  .rgb_pixel(rgb_pixel),
-  .pixel_addr(pixel_addr)
-  );
   
-image_rom my_image_rom (
-    .clk(clk65MHz),
-    .address(pixel_addr),
-    .rgb(rgb_pixel)
-);
+  .vga_out(vga_out)
+  );
 
+assign vs = vga_out[`VGA_VS_BITS];
+assign hs = vga_out[`VGA_HS_BITS];
+assign {r,g,b} = vga_out[`VGA_RGB_BITS]; 
 
 endmodule

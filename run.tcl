@@ -48,6 +48,7 @@ read_verilog {
 	rtl/clock_clk_wiz.v
 	rtl/image_rom.v
 	rtl/delay.v
+	rtl/_vga_macros.vh
 }
 
 read_mem {
