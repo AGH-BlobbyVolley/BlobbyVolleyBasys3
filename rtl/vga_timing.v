@@ -13,10 +13,10 @@
 module vga_timing (
   input wire rst,
   input wire pclk,
-  output reg [10:0] vcount,
+  output reg [11:0] vcount,
   output reg vsync,
   output reg vblnk,
-  output reg [10:0] hcount,
+  output reg [11:0] hcount,
   output reg hsync,
   output reg hblnk  
   );
@@ -41,9 +41,9 @@ parameter 	HOR_TOTAL_TIME 	= 1344,
 
 
 //horizontal counter
-reg [10:0] hcount_nxt;
+reg [11:0] hcount_nxt;
 //vertical counter
-reg [10:0] vcount_nxt;
+reg [11:0] vcount_nxt;
 
 
 always @(posedge pclk) begin

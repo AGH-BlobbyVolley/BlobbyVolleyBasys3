@@ -46,13 +46,15 @@ read_verilog {
 	rtl/reset.v
 	rtl/clock.v
 	rtl/clock_clk_wiz.v
-	rtl/image_rom.v
+	rtl/player1_rom.v
 	rtl/delay.v
 	rtl/_vga_macros.vh
+	rtl/player1.v
 }
 
 read_mem {
 	rtl/image.dat
+	rtl/blobby.dat
 }
 
 add_files -fileset sim_1 {

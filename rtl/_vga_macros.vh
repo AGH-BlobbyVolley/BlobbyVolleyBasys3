@@ -21,14 +21,14 @@
 `define VGA_HCOUNT_BITS 11:0
 
 // VGA BUS SPLIT AT INPUT PORT
-//`define VGA_SPLIT_INPUT(BUS_NAME) \
-//	wire vblnk_in = BUS_NAME[`VGA_VBLNK_BITS]; \
-//	wire hblnk_in = BUS_NAME[`VGA_HBLNK_BITS]; \	
-//	wire vs_in = BUS_NAME[`VGA_VS_BITS]; \
-//	wire hs_in = BUS_NAME[`VGA_HS_BITS]; \
-//	wire [`VGA_RGB_SIZE-1:0] rgb_in = BUS_NAME[`VGA_RGB_BITS]; \
-//	wire [`VGA_VCOUNT_SIZE-1:0] vcount_in = BUS_NAME[`VGA_VCOUNT_BITS]; \
-//	wire [`VGA_HCOUNT_SIZE-1:0] hcount_in = BUS_NAME[`VGA_HCOUNT_BITS];
+`define VGA_SPLIT_INPUT(BUS_NAME) \
+	wire vblnk_in = BUS_NAME[`VGA_VBLNK_BITS]; \
+	wire hblnk_in = BUS_NAME[`VGA_HBLNK_BITS]; \
+	wire vs_in = BUS_NAME[`VGA_VS_BITS]; \
+	wire hs_in = BUS_NAME[`VGA_HS_BITS]; \
+	wire [`VGA_RGB_SIZE-1:0] rgb_in = BUS_NAME[`VGA_RGB_BITS]; \
+	wire [`VGA_VCOUNT_SIZE-1:0] vcount_in = BUS_NAME[`VGA_VCOUNT_BITS]; \
+	wire [`VGA_HCOUNT_SIZE-1:0] hcount_in = BUS_NAME[`VGA_HCOUNT_BITS];
 	
 // VGA BUS OUTPUT VARIABLES
 `define VGA_OUT_WIRE \

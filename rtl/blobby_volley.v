@@ -49,7 +49,7 @@ reset my_reset
   );
 
 
-  wire [10:0] vcount, hcount;
+  wire [11:0] vcount, hcount;
   wire vsync, hsync;
   wire vblnk, hblnk;
 
@@ -63,27 +63,42 @@ vga_timing my_timing (
   .hblnk(hblnk),
   .pclk(clk65MHz)
 );
- 
-wire [19:0] pixel_addr;
-wire [11:0] rgb_pixel;
 
-wire [`VGA_BUS_SIZE-1:0] vga_out;
+wire [`VGA_BUS_SIZE-1:0] vga_bus [1:0];
 
 draw_background my_draw_background (
-  .rst(rst_d),
-  .hcount_in(hcount),
-  .hsync_in(hsync),
-  .hblnk_in(hblnk),
-  .vcount_in(vcount),
-  .vsync_in(vsync),
-  .vblnk_in(vblnk),
-  .pclk(clk65MHz),
-  
-  .vga_out(vga_out)
+	.rst(rst_d),
+	.hcount_in(hcount),
+	.hsync_in(hsync),
+	.hblnk_in(hblnk),
+	.vcount_in(vcount),
+	.vsync_in(vsync),
+	.vblnk_in(vblnk),
+	.pclk(clk65MHz),
+
+	.vga_out(vga_bus[0])
   );
 
-assign vs = vga_out[`VGA_VS_BITS];
-assign hs = vga_out[`VGA_HS_BITS];
-assign {r,g,b} = vga_out[`VGA_RGB_BITS]; 
+wire [3:0] rgb_pixel;
+wire [13:0] pixel_addr;
+
+player1 my_player1(
+	.rst(rst_d),
+	.pclk(clk65MHz),
+	.vga_in(vga_bus[0]),
+	.vga_out(vga_bus[1]),
+	.rgb_pixel(rgb_pixel),
+	.pixel_addr(pixel_addr)
+);
+
+player1_rom my_player1_rom (
+    .clk(clk65MHz),
+    .address(pixel_addr),
+    .rgb(rgb_pixel)
+);
+
+assign vs = vga_bus[1][`VGA_VS_BITS];
+assign hs = vga_bus[1][`VGA_HS_BITS];
+assign {r,g,b} = vga_bus[1][`VGA_RGB_BITS]; 
 
 endmodule

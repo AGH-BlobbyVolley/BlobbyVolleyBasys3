@@ -6,38 +6,20 @@ module draw_background (
     input wire rst,
     input wire pclk,
     
-    input wire [10:0] hcount_in,
+    input wire [11:0] hcount_in,
     input wire hsync_in,
     input wire hblnk_in,
-    input wire [10:0] vcount_in,
+    input wire [11:0] vcount_in,
     input wire vsync_in,
     input wire vblnk_in,
-    
     output wire [`VGA_BUS_SIZE-1:0] vga_out
   );
 
 `VGA_OUT_REG
 `VGA_MERGE_OUTPUT(vga_out)
 
-wire [10:0] hcount_buf;
-wire hsync_buf;
-wire hblnk_buf;
-wire [10:0] vcount_buf;
-wire vsync_buf;
-wire vblnk_buf;
-
 localparam 	WIDTH = 1023,
 			HEIGHT = 767;
-
-
-delay #(.WIDTH(26), .CLK_DEL(2))
-my_delay
-(
-    .din( { hcount_in, hsync_in, hblnk_in, vcount_in, vsync_in, vblnk_in } ),
-    .dout({hcount_buf,hsync_buf,hblnk_buf,vcount_buf,vsync_buf,vblnk_buf}),
-    .rst(rst),
-    .clk(pclk)
-);
 
 always @(posedge pclk) begin
 	if (rst) begin
@@ -49,12 +31,12 @@ always @(posedge pclk) begin
 	vblnk_out <= 0;
 	end
 	else begin
-	hcount_out <= hcount_buf;
-	hs_out <= hsync_buf;
-	hblnk_out <= hblnk_buf;
-	vcount_out <= vcount_buf;
-	vs_out <= vsync_buf;
-	vblnk_out <= vblnk_buf;
+	hcount_out <= hcount_in;
+	hs_out <= hsync_in;
+	hblnk_out <= hblnk_in;
+	vcount_out <= vcount_in;
+	vs_out <= vsync_in;
+	vblnk_out <= vblnk_in;
 	end
 end
 
@@ -66,7 +48,7 @@ always @(posedge pclk) begin
 end
  
 always @* begin
-	if(hblnk_buf | vblnk_buf) rgb_out_nxt = 12'h0_0_0;
+	if(hblnk_in | vblnk_in) rgb_out_nxt = 12'h0_0_0;
 	else begin
 		if(vcount_in<=6 || (vcount_in>12 && vcount_in<=20)) rgb_out_nxt = 12'h3BE;
 		else if((vcount_in>6 && vcount_in<=12) || (vcount_in>20 && vcount_in<=28)) rgb_out_nxt = 12'h6CF;
