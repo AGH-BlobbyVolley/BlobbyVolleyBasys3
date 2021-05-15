@@ -64,7 +64,7 @@ vga_timing my_timing (
   .pclk(clk65MHz)
 );
 
-wire [`VGA_BUS_SIZE-1:0] vga_bus [1:0];
+wire [`VGA_BUS_SIZE-1:0] vga_bus [2:0];
 
 draw_background my_draw_background (
 	.rst(rst_d),
@@ -97,8 +97,27 @@ player1_rom my_player1_rom (
     .rgb(rgb_pixel)
 );
 
-assign vs = vga_bus[1][`VGA_VS_BITS];
-assign hs = vga_bus[1][`VGA_HS_BITS];
-assign {r,g,b} = vga_bus[1][`VGA_RGB_BITS]; 
+wire [3:0] pixel;
+wire [11:0] pixel_addr_ball;
+
+draw_ball my_draw_ball(
+	.rst(rst_d),
+	.pclk(clk65MHz),
+	.vga_in(vga_bus[1]),
+	.vga_out(vga_bus[2]),
+	.pixel(pixel),
+	.pixel_addr(pixel_addr_ball)
+);
+
+ball_rom my_ball_rom (
+    .clk(clk65MHz),
+    .address(pixel_addr_ball),
+    .pixel(pixel)
+);
+
+
+assign vs = vga_bus[2][`VGA_VS_BITS];
+assign hs = vga_bus[2][`VGA_HS_BITS];
+assign {r,g,b} = vga_bus[2][`VGA_RGB_BITS]; 
 
 endmodule

@@ -50,11 +50,14 @@ read_verilog {
 	rtl/delay.v
 	rtl/_vga_macros.vh
 	rtl/player1.v
+	rtl/ball_rom.v
+	rtl/draw_ball.v
 }
 
 read_mem {
 	rtl/image.dat
 	rtl/blobby.dat
+	rtl/ball.dat
 }
 
 add_files -fileset sim_1 {
