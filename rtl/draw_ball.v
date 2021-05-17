@@ -10,16 +10,22 @@ module draw_ball (
     input wire rst,
     input wire pclk,
     
+	input wire [11:0] xpos,
+	input wire [11:0] ypos,
     input wire [`VGA_BUS_SIZE-1:0] vga_in,   
     output wire [`VGA_BUS_SIZE-1:0] vga_out,
 	
 	input wire [3:0] pixel,
 	output reg [11:0] pixel_addr,
 	
-	output reg pl1_col,
-	output reg pl2_col,
-	output reg net_col
+	output wire pl1_col,
+	output wire pl2_col,
+	output wire net_col
   );
+
+localparam  PL1_COLOR = 12'hAAA,
+            PL2_COLOR = 12'h123,
+            NET_COLOR = 12'h321;
 
 `VGA_SPLIT_INPUT(vga_in)
 `VGA_OUT_REG
@@ -36,10 +42,6 @@ wire [11:0] rgb_buf;
 localparam 	WIDTH = 64,
 			HEIGHT = 64;
 
-wire [11:0] xpos, ypos;
-
-assign xpos = 350;
-assign ypos = 500;
 
 delay #(.WIDTH(40), .CLK_DEL(2))
 my_delay
