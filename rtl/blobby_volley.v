@@ -120,7 +120,7 @@ ball_rom my_ball_rom (
 );
 
 ball_pos_ctrl my_ball_pos_ctrl(
-	.rst(rst),
+	.rst(rst_d),
 	.clk(clk65MHz),
 	.pl1_col(test),
 	.pl2_col(1'b0),

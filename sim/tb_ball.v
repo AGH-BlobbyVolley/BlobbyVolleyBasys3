@@ -18,12 +18,12 @@ rst=0;
 @(negedge clk) rst = 0;
 for(i=0;i<6;i=i+1) @(negedge clk);
 #65_000_000 pl1_col = 1;
-
+#70_000_00  pl1_col = 0;
 end
 
 ball_pos_ctrl DUT(
 	.rst(rst),
-	.clk(clk),
+	.clk(clk65MHz),
 	.pl1_col(pl1_col),
 	.pl2_col(1'b0),
 	.net_col(1'b0),
