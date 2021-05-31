@@ -9,6 +9,9 @@
 module player1 (
     input wire rst,
     input wire pclk,
+    input wire [11:0] xpos,
+    input wire [11:0] ypos,
+    input wire mouse_click,
     
     input wire [`VGA_BUS_SIZE-1:0] vga_in,   
     output wire [`VGA_BUS_SIZE-1:0] vga_out,
@@ -32,10 +35,7 @@ wire [11:0] rgb_buf;
 localparam 	WIDTH = 75,
 			HEIGHT = 89;
 
-wire [11:0] xpos, ypos;
 
-assign xpos = 0;
-assign ypos = 0;
 
 delay #(.WIDTH(40), .CLK_DEL(2))
 my_delay

@@ -3,6 +3,8 @@
 `include "_vga_macros.vh"
 
 module blobby_volley(
+  inout ps2_clk,
+  inout ps2_data,
   input wire clk,
   input wire rst,
   output wire vs,
@@ -30,7 +32,59 @@ clock my_clock
  // Clock in ports
   .clk(clk)
  );
+ wire [11:0] my_xpos,my_ypos;
+ wire my_mouse_left;
  
+ MouseCtl my_MouseCtl
+  (
+  .clk(clk100MHz),        
+  .rst(rst),        
+  .xpos(my_xpos),
+  .ypos(my_ypos),      
+  .zpos(),       
+  .left(my_mouse_left),       
+  .middle(),     
+  .right(),      
+  .new_event(),  
+  .value(0),      
+  .setx(),       
+  .sety(),       
+  .setmax_x(0),   
+  .setmax_y(0),   
+  .ps2_clk(ps2_clk),
+  .ps2_data(ps2_data) 
+  );
+  wire [11:0] my_xpos_buf,my_ypos_buf;
+  wire my_mouse_left_buf;
+ 
+ buffor_signal_mouse my_buffor_signal_mouse( 
+ .pclk(clk65MHz),            
+ .rst(rst),             
+ .my_left(my_mouse_left),         
+ .my_xpos(my_xpos),  
+ .my_ypos(my_ypos),  
+ .my_left_buf(my_mouse_left_buf),     
+ .my_xpos_buf(my_xpos_buf),
+ .my_ypos_buf(my_ypos_buf)
+ );
+ 
+ 
+ wire [11:0] my_xpos_limit,my_ypos_limit;
+ wire my_mouse_left_limit;
+ 
+ 
+ mouse_limit_player my_mouse_limit_player(
+ .clk(clk65MHz),            
+ .rst(rst),                                    
+ .xpos(my_xpos_buf),            
+ .ypos(my_ypos_buf),            
+ .click_mouse(my_mouse_left_buf),                   
+ .xpos_limit(my_xpos_limit),      
+ .ypos_limit(my_ypos_limit),      
+ .click_mouse_limit(my_mouse_left_limit)
+ 
+ 
+ );
 reset my_reset 
 (
 	.rst(locked),
@@ -84,6 +138,9 @@ wire [13:0] pixel_addr;
 
 player1 my_player1(
 	.rst(rst_d),
+	.xpos(my_xpos_limit),       
+    .ypos(my_ypos_limit),       
+    .mouse_click(my_mouse_left_limit),
 	.pclk(clk65MHz),
 	.vga_in(vga_bus[0]),
 	.vga_out(vga_bus[1]),
