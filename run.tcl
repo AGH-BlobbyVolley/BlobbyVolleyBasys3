@@ -51,18 +51,27 @@ read_verilog {
 	rtl/delay.v
 	rtl/_vga_macros.vh
 	rtl/player1.v
+<<<<<<< HEAD
         clk_divider.v
 	mouse_limit_player.v
+=======
+	rtl/ball_rom.v
+	rtl/draw_ball.v
+	rtl/ball_pos_ctrl.v
+	rtl/clk_divider.v
+>>>>>>> ball
 }
 
 read_mem {
 	rtl/image.dat
 	rtl/blobby.dat
+	rtl/ball.dat
 }
 
 add_files -fileset sim_1 {
     sim/testbench.v
     sim/tiff_writer.v
+	sim/tb_ball.v
 }
 
 set_property top ${top_module} [current_fileset]
