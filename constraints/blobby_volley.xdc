@@ -52,8 +52,7 @@ set_property PACKAGE_PIN U18 [get_ports {rst}]
 set_property IOSTANDARD LVCMOS33 [get_ports {rst}]
 <<<<<<< HEAD
 
-#mouse 
-
+#mouse
 set_property PACKAGE_PIN C17 [get_ports {ps2_clk}]
 set_property PULLUP true [get_ports ps2_clk]
 set_property IOSTANDARD LVCMOS33 [get_ports {ps2_clk}]
@@ -62,7 +61,6 @@ set_property PACKAGE_PIN B17 [get_ports {ps2_data}]
 set_property PULLUP true [get_ports ps2_data]
 set_property IOSTANDARD LVCMOS33 [get_ports {ps2_data}]
 
-=======
-set_property PACKAGE_PIN T17 [get_ports {test}]
-set_property IOSTANDARD LVCMOS33 [get_ports {test}]
->>>>>>> ball
+#set_property PACKAGE_PIN T17 [get_ports {test}]
+#set_property IOSTANDARD LVCMOS33 [get_ports {test}]
+

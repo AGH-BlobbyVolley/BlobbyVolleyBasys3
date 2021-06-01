@@ -15,6 +15,18 @@ module ball_pos_ctrl(
 	output wire [11:0] ball_posx_out,
 	output wire [11:0] ball_posy_out	
 );
+reg pl1_col_d, pl1_col_d_nxt;
+
+always @(posedge clk) begin
+	if(rst) pl1_col_d <= 0;
+	else pl1_col_d <= pl1_col_d_nxt;
+end
+
+always @* begin
+	if(pl1_col) pl1_col_d_nxt = 1;
+	else if(ball_state==BOUNCE) pl1_col_d_nxt = 0;
+	else pl1_col_d_nxt = pl1_col_d;
+end
 
 localparam GND_LVL = 750;
 
@@ -61,9 +73,9 @@ assign ball_posx_out = ball_posx[11:0];
 assign ball_posy_out = ball_posy[11:0];
 
 
-localparam 	PL_CENTER_POSX = 38,
-			PL_CENTER_POSY = 45,
-			BALL_CENTER_POS = 32;
+localparam 	PL_CENTER_POSX = 12'd38,
+			PL_CENTER_POSY = 12'd45,
+			BALL_CENTER_POS = 12'd32;
 
 reg [2:-7] vel_x, vel_x_nxt, vel_y, vel_y_nxt;
 
@@ -76,7 +88,7 @@ localparam	BALL_SIZE = 64;
 			
 localparam	START_POSX_PL1 	= 12'd250,
 			START_POSX_PL2 	= 12'd774,
-			START_POSY 		= 12'd255;
+			START_POSY 		= 12'd555;
 
 
 localparam 	HANG = 4'b0000,
@@ -96,13 +108,13 @@ end
 always @* begin
 	case(ball_state)
 		HANG: begin
-			if(pl1_col || pl2_col) ball_state_nxt=BOUNCE;
+			if(pl1_col_d || pl2_col) ball_state_nxt=BOUNCE;
 			else ball_state_nxt=HANG;
 		end
 		BOUNCE: if(ovr_touch) ball_state_nxt=WAIT;
 				else ball_state_nxt=FLIGHT;
 		FLIGHT: begin
-			if(pl1_col || pl2_col || wall_col || net_col) ball_state_nxt=BOUNCE;
+			if((pl1_col_d || pl2_col || wall_col || net_col) && ghost_time_done) ball_state_nxt=BOUNCE;
 			else if(gnd_col) ball_state_nxt=WAIT;
 			else ball_state_nxt=FLIGHT;
 		end
@@ -131,9 +143,9 @@ end
 	
 always @* begin
 	case(ball_state)
-		HANG: last_collision_nxt = 	pl1_col ? PL1_COL :
+		HANG: last_collision_nxt = 	pl1_col_d ? PL1_COL :
 									pl2_col ? PL2_COL : NON_COL;
-		FLIGHT: last_collision_nxt = 	pl1_col ? PL1_COL :
+		FLIGHT: last_collision_nxt = 	pl1_col_d ? PL1_COL :
 										pl2_col ? PL2_COL :
 										wall_col ? WALL_COL :
 										GND_COL ? GND_COL : NON_COL;
@@ -143,8 +155,8 @@ end
 
 
 //checking collisions with objects
-assign wall_col = ((ball_posx[11:0] <= 0) || (ball_posx[11:0] >= 1023 - BALL_SIZE)) ? 1'b1 : 1'b0;
-assign gnd_col = (ball_posy[11:0] >=(GND_LVL - BALL_SIZE)) ? 1'b1 : 1'b0;
+assign wall_col = ((ball_posx_nxt[11:0] <= 5) || (ball_posx_nxt[11:0] >= 1018 - BALL_SIZE));
+assign gnd_col = (ball_posy_nxt[11:0] >= (GND_LVL - BALL_SIZE));
 
 //ball move
 always @(posedge clk100Hz) begin
@@ -164,8 +176,8 @@ always @* begin
 			ball_posy_nxt = {START_POSY, 7'b0};
 		end
 		FLIGHT: begin
-			ball_posx_nxt = ball_posx + {(vel_x[0] ? 10'hFFF : 10'b0), vel_x, 1'b0};
-			ball_posy_nxt = ball_posy + ~{(vel_y[0] ? 10'hFFF : 10'b0), vel_y, 1'b0} + 1;
+			ball_posx_nxt = ball_posx + {(vel_x[2] ? 10'hFFF : 10'b0), vel_x, 1'b0};
+			ball_posy_nxt = ball_posy + ~{(vel_y[2] ? 10'hFFF : 10'b0), vel_y, 1'b0} + 1;
 		end
 		default: begin
 			ball_posx_nxt = ball_posx;
@@ -191,7 +203,7 @@ always @* begin
 			case(last_collision) 
 				PL1_COL: begin 
 					vel_x_nxt = {(~(pl1_posx) + ball_posx[11:0] + (BALL_CENTER_POS + 1 - PL_CENTER_POSX)),2'b0};
-					vel_y_nxt = {(pl1_posy + (ball_posy[11:0]) + (PL_CENTER_POSY - BALL_CENTER_POS)),2'b0};
+					vel_y_nxt = {(pl1_posy + ~(ball_posy[11:0]) + (PL_CENTER_POSY + 1 - BALL_CENTER_POS)),2'b0};
 				end
 				PL2_COL: begin
 					vel_x_nxt = (~(pl2_posx) + ball_posx[11:0] + (BALL_CENTER_POS + 1 - PL_CENTER_POSX));
@@ -210,7 +222,7 @@ always @* begin
 		FLIGHT: begin
 			vel_x_nxt = vel_x;
 			if(vel_y=={8'h80,2'b0})  vel_y_nxt = vel_y;
-			else vel_y_nxt = vel_y - 1'b1;
+			else vel_y_nxt = vel_y + 10'hFFF; // - 1'b1
 		end
 		default: begin
 			vel_x_nxt = 0;
@@ -239,6 +251,36 @@ end
 
 assign timer_done = (timer==8'd250);
 
+//Ghost time counter
+
+reg [10:0] ghost_timer, ghost_timer_nxt;
+reg ghost_time_done;
+
+always @(posedge clk100Hz) begin
+	if(rst_d) ghost_timer <= 0;
+	else ghost_timer <= ghost_timer_nxt;
+end
+
+always @* begin
+	case(ball_state)
+		BOUNCE: begin
+			ghost_time_done = 0;
+			ghost_timer_nxt = 0;			
+		end
+		FLIGHT: begin
+			ghost_time_done = (ghost_timer=='d25);
+			if(!ghost_time_done) ghost_timer_nxt = ghost_timer + 1;
+			else ghost_timer_nxt = 0;
+		end
+		default: begin
+			ghost_timer_nxt = 0;
+			ghost_time_done = 0;
+		end
+	endcase
+end
+
+//
+
 always @(posedge clk100Hz) begin
 	if(rst_d) last_touch <= PLAYER1;
 	else last_touch <= last_touch_nxt;
@@ -247,7 +289,7 @@ end
 always @* begin
 	case(ball_state)
 		BOUNCE: begin
-			if(pl1_col)	last_touch_nxt = PLAYER1;
+			if(pl1_col_d)	last_touch_nxt = PLAYER1;
 			else if(pl2_col) last_touch_nxt = PLAYER2;
 			else last_touch_nxt = last_touch;
 		end

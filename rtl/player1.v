@@ -76,8 +76,9 @@ always @* begin
 	if(hblnk_buf | vblnk_buf) rgb_out_nxt = rgb_buf;
 	else if( (ypos <= vcount_buf) && (xpos <= hcount_buf) && (ypos + HEIGHT > vcount_buf) && (xpos + WIDTH > hcount_buf) ) begin
 		if(rgb_pixel=='b0) rgb_out_nxt = rgb_buf;
-		else rgb_out_nxt = {rgb_pixel,rgb_pixel,rgb_pixel};
-		
+		else begin
+			rgb_out_nxt = (rgb_pixel==4'hF) ? 12'hFFF : 12'hABC; //{rgb_pixel,rgb_pixel,rgb_pixel};
+		end
 	end
 	else rgb_out_nxt = rgb_buf;
 end

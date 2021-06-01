@@ -18,12 +18,12 @@ module draw_ball (
 	input wire [3:0] pixel,
 	output reg [11:0] pixel_addr,
 	
-	output wire pl1_col,
+	output reg pl1_col,
 	output wire pl2_col,
 	output wire net_col
   );
 
-localparam  PL1_COLOR = 12'hAAA,
+localparam  PL1_COLOR = 12'hABC,
             PL2_COLOR = 12'h123,
             NET_COLOR = 12'h321;
 
@@ -79,13 +79,19 @@ always @(posedge pclk) begin
 end
  
 always @* begin
-	if(hblnk_buf | vblnk_buf) rgb_out_nxt = rgb_buf;
+	if(hblnk_buf | vblnk_buf) begin
+		rgb_out_nxt = rgb_buf;
+		pl1_col = 0;
+	end	
 	else if( (ypos <= vcount_buf) && (xpos <= hcount_buf) && (ypos + HEIGHT > vcount_buf) && (xpos + WIDTH > hcount_buf) ) begin
+		pl1_col = (pixel!='b0 && rgb_buf==PL1_COLOR);
 		if(pixel=='b0) rgb_out_nxt = rgb_buf;
 		else rgb_out_nxt = {pixel,pixel,pixel};
-		
 	end
-	else rgb_out_nxt = rgb_buf;
+	else begin
+		rgb_out_nxt = rgb_buf;
+		pl1_col = 0;
+	end	
 end
 
 //generating pixel address
@@ -109,9 +115,8 @@ always @(posedge pclk) begin
     if(rst) pixel_addr <= 12'b0;
     else  pixel_addr <= pixel_addr_nxt;
 end
-
-assign pl1_col = (pixel!='b0 && rgb_buf==PL1_COLOR) ? 1'b1 : 1'b0;
-assign pl2_col = (pixel!='b0 && rgb_buf==PL2_COLOR) ? 1'b1 : 1'b0;
-assign net_col = (pixel!='b0 && rgb_buf==NET_COLOR) ? 1'b1 : 1'b0;
+ 
+assign pl2_col = (pixel!='b0 && rgb_buf==PL2_COLOR);
+assign net_col = (pixel!='b0 && rgb_buf==NET_COLOR);
 
 endmodule

@@ -39,11 +39,14 @@ read_xdc {
     constraints/blobby_volley.xdc
 }
 
+read_vhdl {
+	rtl/MouseCtl.vhd
+	rtl/Ps2Interface.vhd
+}
 read_verilog {
     rtl/blobby_volley.v
     rtl/vga_timing.v
 	rtl/draw_background.v
-	buffor_signal_mouse.v
 	rtl/reset.v
 	rtl/clock.v
 	rtl/clock_clk_wiz.v
@@ -51,15 +54,12 @@ read_verilog {
 	rtl/delay.v
 	rtl/_vga_macros.vh
 	rtl/player1.v
-<<<<<<< HEAD
-        clk_divider.v
-	mouse_limit_player.v
-=======
+	rtl/mouse_limit_player.v
+	rtl/buffor_signal_mouse.v
 	rtl/ball_rom.v
 	rtl/draw_ball.v
 	rtl/ball_pos_ctrl.v
 	rtl/clk_divider.v
->>>>>>> ball
 }
 
 read_mem {
