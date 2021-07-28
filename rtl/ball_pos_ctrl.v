@@ -16,23 +16,8 @@ module ball_pos_ctrl(
     output wire [11:0] ball_posy_out
   );
 
-// //------------------------------------------------
-// localparam 	signed RES_X = 1024,
-// 			signed RES_Y = 768;
-
-// localparam signed 	SPEED_X = ,
-// 					SPEED_Y = ;
-
-// signed wire [11:0] pl1_posy_int;
-// signed wire [11:0] ball_posy_int;
-
-// signed wire [11:0] distance_x;
-// signed wire [11:0] distance_y;
-
-// assign pl1_posy_int =~pl1_posy + RES_Y;
-// //------------------------------------------------
-
   reg pl1_col_d, pl1_col_d_nxt;
+  wire [11:0] pl1_posx_int,  pl1_posy_int;
 
   always @(posedge clk)
   begin
@@ -80,6 +65,13 @@ module ball_pos_ctrl(
     else
       rstd_timer_nxt = 0;
   end
+
+  delay #(.WIDTH(24), .CLK_DEL(3)) my_delay_inst(
+    .din({pl1_posx, pl1_posy}),
+    .dout({pl1_posx_int, pl1_posy_int}),
+    .clk(clk100Hz),
+    .rst(rst_d)
+  );
 
   always @(posedge clk)
   begin
@@ -280,8 +272,8 @@ module ball_pos_ctrl(
   end
 
   wire [12:0] vel_x_calc, vel_y_calc;
-  assign vel_x_calc = (~{1'b0, pl1_posx} +   ball_posx[12:0]  + (BALL_CENTER_POS + 1 - PL_CENTER_POSX));
-  assign vel_y_calc = ( {1'b0, pl1_posy} + ~(ball_posy[12:0]) + (PL_CENTER_POSY + 1 - BALL_CENTER_POS));
+  assign vel_x_calc = (~{1'b0, pl1_posx_int} +   ball_posx[12:0]  + (BALL_CENTER_POS + 1 - PL_CENTER_POSX));
+  assign vel_y_calc = ( {1'b0, pl1_posy_int} + ~(ball_posy[12:0]) + (PL_CENTER_POSY + 1 - BALL_CENTER_POS));
 
   always @*
   begin
