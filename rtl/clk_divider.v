@@ -21,14 +21,15 @@ module clk_divider
     (
         input  wire clk_in, // input clock 100 MHz
         input  wire rst,       // async reset active high
-        output reg  clk_div    // output clock
+        output reg  clk_div,    // output clock
+		output reg [clog2(LOOP_COUNTER_AT)-1:0]	count
     );
     // how many times clk_in should be divided
     localparam DIVISOR = SRC_FREQ / FREQ;
     // when the counter should restart from zero
     localparam LOOP_COUNTER_AT = DIVISOR / 2 ;
 
-    reg [clog2(LOOP_COUNTER_AT)-1:0] count;
+    //reg [clog2(LOOP_COUNTER_AT)-1:0] count;
 
     always @( posedge(clk_in), posedge(rst) )
     begin
