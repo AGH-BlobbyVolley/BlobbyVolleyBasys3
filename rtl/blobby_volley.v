@@ -157,10 +157,13 @@ judge my_judge(
 	.rst(rst),
 	.yposball(),
 	.xposball(),
-	.collisions(),
+	.collisionsplayer1(),
+	.collisionsplayer2(),
 	.clk(clk65MHz),
 	.score_player1(),
-	.score_player2()
+	.score_player2(),
+	.flag_point(),
+	.endgame()
 );
 assign vs = vga_bus[1][`VGA_VS_BITS];
 assign hs = vga_bus[1][`VGA_HS_BITS];

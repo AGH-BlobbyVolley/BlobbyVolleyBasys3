@@ -1,25 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 16.08.2021 13:26:05
-// Design Name: 
-// Module Name: judge
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
-
 module judge(
 	    input wire clk, 
 	    input wire rst,
@@ -28,13 +7,21 @@ module judge(
 	    input wire collisionsplayer1,
 	    input wire collisionsplayer2,
         output reg [3:0] score_player1, 
-        output reg [3:0] score_player2
+        output reg [3:0] score_player2,
+        //output reg sideofball
+        output reg flag_point,
+        output reg endgame
+        
     );
     
    wire clk_div;
+   //reg sideofball_nxt; //0-player1 , 1 player2
+   reg endgame_nxt;
+   reg flag_point_nxt; //0-player1 , 1 player2
+   reg score_player1_nxt,score_player2_nxt;
    reg [3:0] state,state_nxt; 
-   reg thirdtouched;
-   reg [2:0] touched;
+   reg [2:0] touchedplayer1 , touchedplayer1_nxt , touchedplayer2,touchedplayer2_nxt;
+   //100hz
    clk_divider 
    #(.FREQ(100), .SRC_FREQ(65_000_000)) 
     my_clk_divider (
@@ -53,10 +40,34 @@ module judge(
                     POINT = 4'b0001,
                         GAMECONT = 4'b0010,
                             ENDGAME = 4'b0100;
+                            
+    always @(posedge clk_div ) begin
+        if(rst)begin
+            score_player1<=0;
+            score_player2<=0;
+            flag_point<=1'bx;
+            endgame<=1'bx;
+            state<=START;
+            touchedplayer1<=0;
+            touchedplayer2<=0;
+        end
+        else begin 
+            score_player1<=score_player1_nxt;
+            score_player2<=score_player2_nxt;
+            flag_point<=flag_point_nxt;
+            endgame<=endgame_nxt;
+            state<=state_nxt;
+            touchedplayer1<=touchedplayer1_nxt;
+            touchedplayer2<=touchedplayer2_nxt;
+        
+        end 
+    end
+    
+    
     always @* begin 
         case(state)
             GAMECONT:begin 
-                if (yposball == GROUND_POSITION || thirdtouched == 1 ) state_nxt = POINT;
+                if (yposball == GROUND_POSITION || touchedplayer1 == 4 || touchedplayer2 == 4 ) state_nxt = POINT;
                 else state_nxt = GAMECONT;
             end
            
@@ -65,10 +76,10 @@ module judge(
                 else state_nxt = START;     
             end  
             ENDGAME: begin  
-                     
+                state_nxt=state;   
             end
             START: begin  
-                if( collisionsplayer1 == 1 || collisionsplayer2 == 1) state_nxt = GAMECONT;
+                if( collisionsplayer1 == 1 || collisionsplayer2 == 1) state_nxt = GAMECONT; // player 1 - 0 ; player 2 to 1 
                 else state_nxt = START;          
             end        
             default: state_nxt=state;
@@ -78,7 +89,45 @@ module judge(
     always @* begin 
          case(state)
             GAMECONT : begin  //licznik kolizji 
-                if( collisionsplayer1 == 1  ) 
+                touchedplayer1_nxt = ( collisionsplayer1 == 1 && xposball < PLAYINGFIELD1 + 24 && yposball != GROUND_POSITION )? touchedplayer1 + 1 : touchedplayer1;    
+                touchedplayer2_nxt = ( collisionsplayer2 == 1 && xposball > PLAYINGFIELD2 - 24 && yposball != GROUND_POSITION )? touchedplayer2 + 1 : touchedplayer2;     
+                endgame_nxt = endgame;
+                score_player2_nxt=score_player2;
+                score_player1_nxt=score_player1;
+                flag_point_nxt= flag_point;
+            end
+            POINT: begin
+                flag_point_nxt =  ( touchedplayer2 == 4 || (yposball == GROUND_POSITION && xposball > PLAYINGFIELD2 - 24 )) ? 0 : 1;
+                touchedplayer1_nxt= touchedplayer1;
+                touchedplayer2_nxt= touchedplayer2;
+                endgame_nxt =  endgame;
+                //flag_point_nxt =  ( touchedplayer1 == 4 || (yposball == GROUND_POSITION && xposball < PLAYINGFIELD1 + 24 )) ? 1 : flag_point; 
+                score_player2_nxt = (( touchedplayer1 == 4 || (yposball == GROUND_POSITION && xposball < PLAYINGFIELD1 + 24 ))&& flag_point == 1) ? score_player2 + 1 : score_player2;
+                score_player1_nxt = (( touchedplayer2 == 4 || (yposball == GROUND_POSITION && xposball > PLAYINGFIELD2 - 24 ))&& flag_point == 0) ? score_player1 + 1 : score_player1;
+            end
+            START:begin
+                touchedplayer1_nxt = 0;
+                touchedplayer2_nxt = 0;
+                endgame_nxt = 0;
+                score_player2_nxt=score_player2;
+                score_player1_nxt=score_player1;
+                flag_point_nxt= flag_point;
+            end
+            ENDGAME:begin
+                touchedplayer1_nxt = touchedplayer1;                  
+                touchedplayer2_nxt = touchedplayer2;                  
+                score_player2_nxt=score_player2;         
+                score_player1_nxt=score_player1;         
+                flag_point_nxt= flag_point;              
+                endgame_nxt = 1;
+            end
+            default: begin
+                touchedplayer1_nxt = touchedplayer1;     
+                touchedplayer2_nxt = touchedplayer2;     
+                score_player2_nxt=score_player2;         
+                score_player1_nxt=score_player1;         
+                flag_point_nxt= flag_point; 
+                endgame_nxt =  endgame;            
             end
          endcase   
     end 
