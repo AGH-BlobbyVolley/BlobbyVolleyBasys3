@@ -7,7 +7,6 @@ module blobby_volley(
   inout ps2_data,
   input wire clk,
   input wire rst,
-  //input wire test,
   output wire vs,
   output wire hs,
   output wire [3:0] r,
@@ -83,8 +82,9 @@ clock my_clock
  .xpos_limit(my_xpos_limit),      
  .ypos_limit(my_ypos_limit),      
  .click_mouse_limit(my_mouse_left_limit)
+ 
+ 
  );
-
 reset my_reset 
 (
 	.rst(locked),
@@ -118,7 +118,7 @@ vga_timing my_timing (
   .pclk(clk65MHz)
 );
 
-wire [`VGA_BUS_SIZE-1:0] vga_bus [2:0];
+wire [`VGA_BUS_SIZE-1:0] vga_bus [1:0];
 
 draw_background my_draw_background (
 	.rst(rst_d),
@@ -129,6 +129,7 @@ draw_background my_draw_background (
 	.vsync_in(vsync),
 	.vblnk_in(vblnk),
 	.pclk(clk65MHz),
+
 	.vga_out(vga_bus[0])
   );
 
@@ -152,48 +153,17 @@ player1_rom my_player1_rom (
     .address(pixel_addr),
     .rgb(rgb_pixel)
 );
-
-wire [3:0] pixel;
-wire [11:0] pixel_addr_ball;
-wire [11:0] ball_xpos, ball_ypos;
-wire pl1_col;
-
-draw_ball my_draw_ball(
-	.rst(rst_d),
-	.pclk(clk65MHz),
-	.vga_in(vga_bus[1]),
-	.vga_out(vga_bus[2]),
-	.pixel(pixel),
-	.pixel_addr(pixel_addr_ball),
-	.xpos(ball_xpos),
-	.ypos(ball_ypos),
-	.pl1_col(pl1_col)
-);
-
-ball_rom my_ball_rom (
-    .clk(clk65MHz),
-    .address(pixel_addr_ball),
-    .pixel(pixel)
-);
-
-ball_pos_ctrl my_ball_pos_ctrl(
-	.rst(rst_d),
+judge my_judge(
+	.rst(rst),
+	.yposball(),
+	.xposball(),
+	.collisions(),
 	.clk(clk65MHz),
-	.pl1_col(pl1_col),
-	.pl2_col(1'b0),
-	.net_col(1'b0),
-	.pl1_posx(my_xpos_limit),
-	.pl1_posy(my_ypos_limit),
-	.pl2_posx(12'b0),
-	.pl2_posy(12'b0),
-	.gnd_col(),
-	.ovr_touch(),
-	.ball_posx_out(ball_xpos),
-	.ball_posy_out(ball_ypos)
+	.score_player1(),
+	.score_player2()
 );
-
-assign vs = vga_bus[2][`VGA_VS_BITS];
-assign hs = vga_bus[2][`VGA_HS_BITS];
-assign {r,g,b} = vga_bus[2][`VGA_RGB_BITS]; 
+assign vs = vga_bus[1][`VGA_VS_BITS];
+assign hs = vga_bus[1][`VGA_HS_BITS];
+assign {r,g,b} = vga_bus[1][`VGA_RGB_BITS]; 
 
 endmodule
