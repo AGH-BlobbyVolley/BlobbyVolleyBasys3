@@ -23,12 +23,12 @@ end
 
 ball_pos_ctrl DUT(
 	.rst(rst),
-	.clk(clk65MHz),
+	.clk(clk),
 	.pl1_col(pl1_col),
 	.pl2_col(1'b0),
 	.net_col(1'b0),
-	.pl1_posx(12'd180),
-	.pl1_posy(12'd325),
+	.pl1_posx(12'd320),
+	.pl1_posy(12'd600),
 	.pl2_posx(12'b0),
 	.pl2_posy(12'b0),
 	.gnd_col(),
