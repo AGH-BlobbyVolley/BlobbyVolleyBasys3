@@ -87,7 +87,7 @@ module ball_pos_ctrl(
       rstd_timer_nxt = 0;
   end
 
-  delay #(.WIDTH(24), .CLK_DEL(3)) my_delay_inst(
+  delay #(.WIDTH(48), .CLK_DEL(3)) my_delay_inst(
           .din({pl1_posx, pl1_posy, pl2_posx, pl2_posy}),
           .dout({pl1_posx_int, pl1_posy_int, pl2_posx_int, pl2_posy_int}),
           .clk(clk100Hz),
@@ -294,8 +294,8 @@ module ball_pos_ctrl(
   end
 
   wire [12:0] vel_x_calc, vel_y_calc;
-  assign vel_x_calc = (~{1'b0, (last_collision==PL1_COL) ? pl1_posx_int : pl2_posx_int} +   ball_posx[12:0]  + (BALL_CENTER_POS + 1 - PL_CENTER_POSX));
-  assign vel_y_calc = ( {1'b0, (last_collision==PL1_COL) ? pl1_posy_int : pl2_posy_int} + ~(ball_posy[12:0]) + (PL_CENTER_POSY + 1 - BALL_CENTER_POS));
+  assign vel_x_calc = (~{1'b0, ((last_collision==PL1_COL) ? pl1_posx_int : pl2_posx_int)} +   ball_posx[12:0]  + (BALL_CENTER_POS + 1 - PL_CENTER_POSX));
+  assign vel_y_calc = ( {1'b0, ((last_collision==PL1_COL) ? pl1_posy_int : pl2_posy_int)} + ~(ball_posy[12:0]) + (PL_CENTER_POSY + 1 - BALL_CENTER_POS));
 
   always @*
   begin
