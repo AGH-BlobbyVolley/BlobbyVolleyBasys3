@@ -40,32 +40,33 @@ read_xdc {
 }
 
 read_vhdl {
-	rtl/MouseCtl.vhd
-	rtl/Ps2Interface.vhd
+	rtl/common/MouseCtl.vhd
+	rtl/common/Ps2Interface.vhd
 }
 read_verilog {
-    rtl/blobby_volley.v
-    rtl/vga_timing.v
-	rtl/draw_background.v
-	rtl/reset.v
-	rtl/clock.v
-	rtl/clock_clk_wiz.v
-	rtl/player1_rom.v
-	rtl/delay.v
-	rtl/_vga_macros.vh
-	rtl/player1.v
-	rtl/mouse_limit_player.v
-	rtl/buffor_signal_mouse.v
-	rtl/ball_rom.v
-	rtl/draw_ball.v
-	rtl/ball_pos_ctrl.v
-	rtl/clk_divider.v
+    rtl/common/blobby_volley.v
+    rtl/common/vga_timing.v
+	rtl/common/draw_background.v
+	rtl/common/reset.v
+	rtl/basys_1/clock.v
+	rtl/basys_1/clock_clk_wiz.v
+	rtl/common/player1_rom.v
+	rtl/common/delay.v
+	rtl/common/_vga_macros.vh
+	rtl/common/player1.v
+	rtl/common/mouse_limit_player.v
+	rtl/common/buffor_signal_mouse.v
+	rtl/common/ball_rom.v
+	rtl/common/draw_ball.v
+	rtl/basys_1/ball_pos_ctrl.v
+	rtl/common/clk_divider.v
+    rtl/basys_1/judge.v
 }
 
 read_mem {
-	rtl/image.dat
-	rtl/blobby.dat
-	rtl/ball.dat
+	rtl/common/image.dat
+	rtl/common/blobby.dat
+	rtl/common/ball.dat
 }
 
 add_files -fileset sim_1 {
