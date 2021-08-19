@@ -10,6 +10,7 @@ module ball_pos_ctrl(
     (* mark_debug = "true" *) input wire [11:0] pl1_posy,
     input wire [11:0] pl2_posx,
     input wire [11:0] pl2_posy,
+    input wire last_touch,
     output wire gnd_col,
     output reg ovr_touch,
     output wire [11:0] ball_posx_out,
@@ -133,7 +134,7 @@ module ball_pos_ctrl(
   reg signed	[12:-7] vel_x, vel_x_nxt;
   reg signed 	[12:-7] vel_y, vel_y_nxt;
 
-  reg last_touch, last_touch_nxt;
+  //reg last_touch, last_touch_nxt;
 
   localparam	PLAYER1 = 1'b0,
              PLAYER2 = 1'b1;
@@ -401,7 +402,7 @@ module ball_pos_ctrl(
 
   //
 
-  always @(posedge clk100Hz)
+ /* always @(posedge clk100Hz)
   begin
     if(rst_d)
       last_touch <= PLAYER1;
@@ -424,6 +425,6 @@ module ball_pos_ctrl(
       default:
         last_touch_nxt = last_touch;
     endcase
-  end
+  end*/
 
 endmodule

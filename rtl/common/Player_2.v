@@ -1,31 +1,21 @@
-/*--------------------------------------*/
-/*      AUTHOR - Stanislaw Klat         */             
-/*--------------------------------------*/
-
 `timescale 1ns / 1ps
+
 
 `include "_vga_macros.vh"
 
-module draw_ball (
+module Player_2(
     input wire rst,
     input wire pclk,
+    input wire [11:0] xpos,//xpos
+    input wire [11:0] ypos,//xpos
+    input wire mouse_click,
     
-	input wire [11:0] xpos,
-	input wire [11:0] ypos,
     input wire [`VGA_BUS_SIZE-1:0] vga_in,   
     output wire [`VGA_BUS_SIZE-1:0] vga_out,
 	
-	input wire [3:0] pixel,
-	output reg [11:0] pixel_addr,
-	
-	output reg pl1_col,
-	output wire pl2_col,
-	output wire net_col
+	input wire [3:0] rgb_pixel,
+	output reg [13:0] pixel_addr
   );
-
-localparam  PL1_COLOR = 12'h000,
-            PL2_COLOR = 12'hF00,
-            NET_COLOR = 12'h321;
 
 `VGA_SPLIT_INPUT(vga_in)
 `VGA_OUT_REG
@@ -39,8 +29,10 @@ wire vsync_buf;
 wire vblnk_buf;
 wire [11:0] rgb_buf;
 
-localparam 	WIDTH = 64,
-			HEIGHT = 64;
+
+localparam 	WIDTH = 75,
+			HEIGHT = 89;
+
 
 
 delay #(.WIDTH(40), .CLK_DEL(2))
@@ -79,44 +71,35 @@ always @(posedge pclk) begin
 end
  
 always @* begin
-	if(hblnk_buf | vblnk_buf) begin
-		rgb_out_nxt = rgb_buf;
-		pl1_col = 0;
-	end	
+	if(hblnk_buf | vblnk_buf) rgb_out_nxt = rgb_buf;
 	else if( (ypos <= vcount_buf) && (xpos <= hcount_buf) && (ypos + HEIGHT > vcount_buf) && (xpos + WIDTH > hcount_buf) ) begin
-		pl1_col = (pixel!='b0 && rgb_buf==PL1_COLOR);
-		if(pixel=='b0) rgb_out_nxt = rgb_buf;
-		else rgb_out_nxt = {pixel,pixel,pixel};
+		if(rgb_pixel=='b0) rgb_out_nxt = rgb_buf;
+		else begin
+			rgb_out_nxt = (rgb_pixel==4'hF) ? 12'hFFF : 12'hF00; //{rgb_pixel,rgb_pixel,rgb_pixel};
+		end
 	end
-	else begin
-		rgb_out_nxt = rgb_buf;
-		pl1_col = 0;
-	end	
+	else rgb_out_nxt = rgb_buf;
 end
 
 //generating pixel address
 
-reg [11:0] pixel_addr_nxt;
+reg [13:0] pixel_addr_nxt;
 
 always @* begin
     if( (ypos <= vcount_in) && (xpos <= hcount_in) && (ypos + HEIGHT > vcount_in) && (xpos + WIDTH > hcount_in) )
     begin
-	   if(ypos == vcount_in && xpos == hcount_in) pixel_addr_nxt = 12'b0;
+	   if(ypos == vcount_in && xpos == hcount_in) pixel_addr_nxt = 14'b0;
        else if(pixel_addr<WIDTH*HEIGHT-1) 
 	   begin 
 	   pixel_addr_nxt = pixel_addr + 1;
 	   end
-       else pixel_addr_nxt = 12'b0;
+       else pixel_addr_nxt = 14'b0;
     end
 	else pixel_addr_nxt = pixel_addr;
 end
 
 always @(posedge pclk) begin
-    if(rst) pixel_addr <= 12'b0;
+    if(rst) pixel_addr <= 14'b0;
     else  pixel_addr <= pixel_addr_nxt;
 end
- 
-assign pl2_col = (pixel!='b0 && rgb_buf==PL2_COLOR);
-assign net_col = (pixel!='b0 && rgb_buf==NET_COLOR);
-
 endmodule
