@@ -53,6 +53,7 @@ read_verilog {
 	rtl/common/player1_rom.v
 	rtl/common/delay.v
 	rtl/common/_vga_macros.vh
+	rtl/common/Player_2.v
 	rtl/common/player1.v
 	rtl/common/mouse_limit_player.v
 	rtl/common/buffor_signal_mouse.v

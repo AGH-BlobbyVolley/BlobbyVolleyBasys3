@@ -12,7 +12,8 @@ module blobby_volley(
   output wire [3:0] r,
   output wire [3:0] g,
   output wire [3:0] b,
-  output wire pclk_mirror
+  output wire pclk_mirror , 
+  output wire [15:0] LED
   );
 wire clk100MHz;
 wire clk65MHz;
@@ -186,7 +187,7 @@ ball_rom my_ball_rom (
     .address(pixel_addr_ball),
     .pixel(pixel)
 );
-wire last_touch,thirdtouched;
+wire last_touch,thirdtouched,gnd_col;
 ball_pos_ctrl my_ball_pos_ctrl(
 	.rst(rst_d),
 	.clk(clk65MHz),
@@ -197,7 +198,7 @@ ball_pos_ctrl my_ball_pos_ctrl(
 	.pl1_posy(my_ypos_limit),
 	.pl2_posx(12'b0),
 	.pl2_posy(12'b0),
-	.gnd_col(),
+	.gnd_col(gnd_col),
 	.ovr_touch(thirdtouched),
 	.last_touch(last_touch),
 	.ball_posx_out(ball_xpos),
@@ -205,15 +206,16 @@ ball_pos_ctrl my_ball_pos_ctrl(
 );
 
 judge my_judge(
-	.rst(rst),
+	.rst(rst_d),
+	.gnd_col(gnd_col),
 	.yposball(ball_ypos),
 	.xposball(ball_xpos),
 	.collisionsplayer1(pl1_col),
 	.collisionsplayer2(1'b0),
 	.clk(clk65MHz),
 	.score_player1(),
-	.score_player2(),
-	.flag_point(last_touch),
+	.score_player2(LED),
+	.flag_point(),
 	.endgame(),
 	.thirdtouched(thirdtouched)
 );

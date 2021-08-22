@@ -22,7 +22,8 @@ module ball_pos_ctrl(
   reg [3:0] ball_state, ball_state_nxt;
   wire clk100Hz;
   wire [18:0] div_count;
-
+  reg ovr_touch_d_nxt , ovr_touch_d; 
+  
   clk_divider #(.FREQ(100), .SRC_FREQ(65_000_000)) my_clk_divider(
                 .clk_in(clk),
                 .rst(rst),
@@ -66,6 +67,25 @@ module ball_pos_ctrl(
       pl2_col_d_nxt = 0;
     else
       pl2_col_d_nxt = (div_count==16'hFFFF && ~clk100Hz) ? 0 : pl2_col_d;
+  end
+  
+  always @(posedge clk)
+  begin
+    if(rst)
+      ovr_touch_d <= 0;
+    else
+      ovr_touch_d <= ovr_touch_d_nxt;
+  end
+  
+  
+  always @*
+  begin
+    if(ovr_touch)
+      ovr_touch_d_nxt = 1;
+    else if(ball_state==BOUNCE)
+      ovr_touch_d_nxt = 0;
+    else
+      ovr_touch_d_nxt = (div_count==16'hFFFF && ~clk100Hz) ? 0 : ovr_touch_d;
   end
   //
 
@@ -175,7 +195,7 @@ module ball_pos_ctrl(
           ball_state_nxt=HANG;
       end
       BOUNCE:
-        if(ovr_touch)
+        if(ovr_touch_d)
           ball_state_nxt=WAIT;
         else
           ball_state_nxt=FLIGHT;
