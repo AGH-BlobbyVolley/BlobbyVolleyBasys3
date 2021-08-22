@@ -216,6 +216,12 @@ judge my_judge(
 	.thirdtouched(thirdtouched)
 );
 
+font_rom my_font_rom(
+    .clk(clk65MHz),
+    .address(15'b0),
+    .pixel()
+);
+
 assign vs = vga_bus[3][`VGA_VS_BITS];
 assign hs = vga_bus[3][`VGA_HS_BITS];
 assign {r,g,b} = vga_bus[3][`VGA_RGB_BITS]; 

@@ -62,12 +62,14 @@ read_verilog {
 	rtl/basys_1/ball_pos_ctrl.v
 	rtl/common/clk_divider.v
     rtl/basys_1/judge.v
+    rtl/common/font_rom.v
 }
 
 read_mem {
 	rtl/common/image.dat
 	rtl/common/blobby.dat
 	rtl/common/ball.dat
+    rtl/common/font.dat
 }
 
 add_files -fileset sim_1 {

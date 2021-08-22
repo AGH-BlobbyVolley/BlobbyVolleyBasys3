@@ -138,7 +138,7 @@ uart my_uart (
 
 wire [11:0] ball_posx, ball_posy, pl1_posx, pl2_posy;
 
-uart_demux (
+uart_demux my_uart_demux(
     .data(uart_to_reg),
     .clk(clk65MHz),
     .rst(rst_d),
