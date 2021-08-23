@@ -109,7 +109,7 @@ vga_timing my_timing (
   .hblnk(hblnk),
   .pclk(clk65MHz)
 );
-wire [`VGA_BUS_SIZE-1:0] vga_bus [3:0];
+wire [`VGA_BUS_SIZE-1:0] vga_bus [4:0];
 draw_background my_draw_background (
 	.rst(rst_d),
 	.hcount_in(hcount),
@@ -221,9 +221,32 @@ font_rom my_font_rom(
     .address(15'b0),
     .pixel()
 );
+wire [19:0] titel_addr;
+wire [5:0] pixel_titel;
+titel_rom my_titel_rom(
+    .clk(clk65MHz),
+    .address(titel_addr),
+    .pixel(pixel_titel)
+);
 
-assign vs = vga_bus[3][`VGA_VS_BITS];
-assign hs = vga_bus[3][`VGA_HS_BITS];
-assign {r,g,b} = vga_bus[3][`VGA_RGB_BITS]; 
+menu my_menu(
+ .rst(rst_d),                          
+ .pclk(clk65MHz),                         
+ .hcount_in(hcount),             
+ .hsync_in(hsync),                     
+ .hblnk_in(hblnk),                     
+ .vcount_in(vcount),             
+ .vsync_in(vsync),                     
+ .vblnk_in(vblnk),                     
+ .rgb_pixel(pixel_titel),              
+                               
+ .vga_out(vga_bus[4]), 
+ .pixel_addr(titel_addr)                     
+);
+
+
+assign vs = vga_bus[4][`VGA_VS_BITS];
+assign hs = vga_bus[4][`VGA_HS_BITS];
+assign {r,g,b} = vga_bus[4][`VGA_RGB_BITS]; 
 
 endmodule
