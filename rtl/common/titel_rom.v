@@ -6,28 +6,28 @@ module titel_rom (
 );
 
 
-(* rom_style = "block" *) reg [23:0] ram [0:26199];
-reg [5:0] buf1,buf2,buf3,buf4,pixel_nxt;
-wire we; 
+(*rom_style="block"*)reg [5:0] rom [0:26200*4-1];
+//wire [5:0] buf1,buf2,buf3,buf4;
+//reg [5:0] pixel_nxt;
+wire en; 
+//reg [23:0] temp;
 
-assign we = 0;
+assign en = 1'b1;
 
-initial $readmemb("titel1.dat",ram );
+initial $readmemb("titel.dat",rom );
 always @(posedge clk)begin
-    if (we) 
-        ram[address[19:2]] <= 24'b0;
-    //{buf1,buf2,buf3,buf4} <= ram[address[19:2]];
-    pixel <= ram[address[19:2]];
+    if (en) pixel <= rom[address[19:0]];
 end
+
+/*assign {buf1,buf2,buf3,buf4} = temp; 
     
 always @(posedge clk)begin
     if (rst)
         pixel <=0;
-        
     else
         pixel <= pixel_nxt;
 end
-/*
+
 always @* begin
     case (address[1:0])
         2'b00:pixel_nxt =  buf1;
