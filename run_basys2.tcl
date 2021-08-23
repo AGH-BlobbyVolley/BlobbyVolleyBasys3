@@ -71,6 +71,7 @@ read_verilog {
 	rtl/common/ball_rom.v
 	rtl/common/draw_ball.v
 	rtl/common/clk_divider.v
+    rtl/basys_2/uart_mux.v
 }
 
 read_mem {

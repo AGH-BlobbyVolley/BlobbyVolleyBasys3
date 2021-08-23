@@ -125,20 +125,22 @@ draw_background my_draw_background (
 	.vga_out(vga_bus[0])
   );
 
-wire [15:0] uart_to_reg;
+wire [15:0] uart_to_reg, reg_to_uart;
+wire tx_done;
 
 uart my_uart (
 	.clk(clk65MHz),
 	.rst(rst_d),
 	.rx(rx),
 	.tx(tx),
-	.data_in(16'b0),
+  .tx_done(tx_done),
+	.data_in(reg_to_uart),
 	.data_out(uart_to_reg)
 );
 
-wire [11:0] ball_posx, ball_posy, pl1_posx, pl2_posy;
+wire [11:0] ball_posx, ball_posy, pl1_posx, pl1_posy;
 
-uart_demux (
+uart_demux my_uart_demux(
     .data(uart_to_reg),
     .clk(clk65MHz),
     .rst(rst_d),
@@ -152,6 +154,18 @@ uart_demux (
     .pl2_score(),
     .flag_point(),
     .end_game()
+  );
+
+uart_mux my_uart_mux(
+    .clk(clk65MHz),
+    .rst(rst_d),
+    .tx_done(tx_done),
+    //input data to mux
+    .pl2_posx(my_xpos_limit),
+    .pl2_posy(my_ypos_limit),
+    .start_game(1'b0),
+    //mux output
+    .data(reg_to_uart)
   );
 
 wire [3:0] rgb_pixel;
