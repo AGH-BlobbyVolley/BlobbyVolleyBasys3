@@ -67,11 +67,9 @@ reg [15:0] data_nxt;
         BALL_POSY:
           data_nxt = {sel,ball_posy};
         MATCH_CTRL:
-        begin
           data_nxt = {sel,end_game,flag_point,pl2_score,pl1_score};
-        end
         default:
-            data_nxt = data;
+            data_nxt = {sel, 12'b0};
       endcase
     end
 
