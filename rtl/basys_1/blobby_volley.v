@@ -126,7 +126,7 @@ draw_background my_draw_background (
   );
 wire [15:0] uart_to_reg, reg_to_uart;
   wire tx_done;
-  
+  wire con_broken;
   uart my_uart (
       .clk(clk65MHz),
       .rst(rst_d),
@@ -134,7 +134,8 @@ wire [15:0] uart_to_reg, reg_to_uart;
       .tx(tx),
       .tx_done(tx_done),
       .data_in(reg_to_uart),
-      .data_out(uart_to_reg)
+      .data_out(uart_to_reg),
+      .con_broken(con_broken)
   );
   wire [3:0] score_player1,score_player2;
   wire [11:0] ball_posx, ball_posy, pl1_posx, pl1_posy,xpos_pl2,ypos_pl2;
@@ -164,7 +165,8 @@ wire [15:0] uart_to_reg, reg_to_uart;
         .pl1_score(score_player1),
         .pl2_score(score_player2),
         .flag_point(last_touch),
-        .end_game(endgame)
+        .end_game(endgame),
+        .con_broken(con_broken)
     );
 wire [3:0] rgb_pixel;
 wire [13:0] pixel_addr;

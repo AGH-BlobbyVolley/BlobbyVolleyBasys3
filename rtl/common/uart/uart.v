@@ -7,13 +7,15 @@ module uart (
 	output wire tx,
 	output wire tx_done,
 	input wire [15:0] data_in,
-	output wire [15:0] data_out
+	output wire [15:0] data_out,
+	output wire tick,
+	output wire con_broken
 );
 
-wire tick;
+//wire tick;
 wire rx_done;
 
-mod_m_counter #(.N(6), .M(35)) // 9 i 326 teraz jest 115200
+mod_m_counter #(.N(8), .M(212)) // 9 i 326 teraz jest 115200
 my_mod_m_counter(
 	.clk(clk),
 	.reset(rst),
@@ -45,7 +47,9 @@ uart_tx my_uart_tx(
 conv8to16bit my_conv8to16bit(
 	.clk(clk),
 	.rst(rst),
-	.tick(rx_done),
+	.clk_tick(tick),
+    .data_tick(rx_done),
+    .con_broken(con_broken),
 	.din(data_rx),
 	.dout(data_out)
 );

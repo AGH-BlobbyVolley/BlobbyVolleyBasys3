@@ -43,6 +43,7 @@ module uart_rx
          end
 
    // FSMD next-state logic
+   //! fsm_extract
    always @*
    begin
       state_next = state_reg;
