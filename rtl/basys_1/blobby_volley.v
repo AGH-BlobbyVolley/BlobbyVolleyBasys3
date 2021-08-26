@@ -79,8 +79,6 @@ clock my_clock
  .xpos_limit(my_xpos_limit),      
  .ypos_limit(my_ypos_limit),      
  .click_mouse_limit(my_mouse_left_limit)
-
-
  );
 
 reset my_reset 
@@ -111,7 +109,7 @@ vga_timing my_timing (
   .hblnk(hblnk),
   .pclk(clk65MHz)
 );
-wire [`VGA_BUS_SIZE-1:0] vga_bus [2:0];
+wire [`VGA_BUS_SIZE-1:0] vga_bus [3:0];
 draw_background my_draw_background (
 	.rst(rst_d),
 	.hcount_in(hcount),
@@ -138,6 +136,27 @@ player1 my_player1(
 	.rgb_pixel(rgb_pixel),
 	.pixel_addr(pixel_addr)
 );
+wire [3:0] rgb_pixel2;
+wire [13:0] pixel_addr2;
+
+Player_2 my_player2(
+	.rst(rst_d),
+	.xpos(800),       
+    .ypos(624),       
+    .mouse_click(my_mouse_left_limit),
+	.pclk(clk65MHz),
+	.vga_in(vga_bus[1]),
+	.vga_out(vga_bus[2]),
+	.rgb_pixel(rgb_pixel2),
+	.pixel_addr(pixel_addr2)
+);
+
+player1_rom my_player2_rom (
+    .clk(clk65MHz),
+    .address(pixel_addr2),
+    .rgb(rgb_pixel2)
+);
+
 player1_rom my_player1_rom (
     .clk(clk65MHz),
     .address(pixel_addr),
@@ -151,8 +170,8 @@ wire pl1_col;
 draw_ball my_draw_ball(
 	.rst(rst_d),
 	.pclk(clk65MHz),
-	.vga_in(vga_bus[1]),
-	.vga_out(vga_bus[2]),
+	.vga_in(vga_bus[2]),
+	.vga_out(vga_bus[3]),
 	.pixel(pixel),
 	.pixel_addr(pixel_addr_ball),
 	.xpos(ball_xpos),
@@ -165,7 +184,7 @@ ball_rom my_ball_rom (
     .address(pixel_addr_ball),
     .pixel(pixel)
 );
-
+wire last_touch,thirdtouched;
 ball_pos_ctrl my_ball_pos_ctrl(
 	.rst(rst_d),
 	.clk(clk65MHz),
@@ -177,26 +196,28 @@ ball_pos_ctrl my_ball_pos_ctrl(
 	.pl2_posx(12'b0),
 	.pl2_posy(12'b0),
 	.gnd_col(),
-	.ovr_touch(),
+	.ovr_touch(thirdtouched),
+	.last_touch(last_touch),
 	.ball_posx_out(ball_xpos),
 	.ball_posy_out(ball_ypos)
 );
 
 judge my_judge(
 	.rst(rst),
-	.yposball(),
-	.xposball(),
-	.collisionsplayer1(),
-	.collisionsplayer2(),
+	.yposball(ball_ypos),
+	.xposball(ball_xpos),
+	.collisionsplayer1(pl1_col),
+	.collisionsplayer2(1'b0),
 	.clk(clk65MHz),
 	.score_player1(),
 	.score_player2(),
-	.flag_point(),
-	.endgame()
+	.flag_point(last_touch),
+	.endgame(),
+	.thirdtouched(thirdtouched)
 );
 
-assign vs = vga_bus[2][`VGA_VS_BITS];
-assign hs = vga_bus[2][`VGA_HS_BITS];
-assign {r,g,b} = vga_bus[2][`VGA_RGB_BITS]; 
+assign vs = vga_bus[3][`VGA_VS_BITS];
+assign hs = vga_bus[3][`VGA_HS_BITS];
+assign {r,g,b} = vga_bus[3][`VGA_RGB_BITS]; 
 
 endmodule

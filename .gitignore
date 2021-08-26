@@ -1,5 +1,6 @@
 $ cat .gitignore
 build
+_Previews
 .Xil
 *.jou
 *.pdf
