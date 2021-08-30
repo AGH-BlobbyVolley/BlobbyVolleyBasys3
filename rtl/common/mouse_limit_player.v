@@ -36,7 +36,7 @@ module mouse_limit_player(
     localparam MAX_X_PLAYER1=500;
     localparam MIN_X_PLAYER1=0;
     localparam GROUND_POSITION=679;
-    localparam JUMP_POSITION=350;
+    localparam JUMP_POSITION=450;
     
     localparam MOVE = 3'b000;
     localparam CLICK =3'b001;

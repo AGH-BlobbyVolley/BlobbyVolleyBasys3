@@ -116,6 +116,8 @@ wire [`VGA_BUS_SIZE-1:0] vga_bus [3:0];
 draw_background my_draw_background (
 	.rst(rst_d),
 	.hcount_in(hcount),
+	.scorepl1(),
+	.scorepl2(),
 	.hsync_in(hsync),
 	.hblnk_in(hblnk),
 	.vcount_in(vcount),
@@ -145,7 +147,7 @@ wire [13:0] pixel_addr2;
 Player_2 my_player2(
 	.rst(rst_d),
 	.xpos(800),       
-    .ypos(624),       
+    .ypos(680),       
     .mouse_click(my_mouse_left_limit),
 	.pclk(clk65MHz),
 	.vga_in(vga_bus[1]),
@@ -168,7 +170,7 @@ player1_rom my_player1_rom (
 wire [3:0] pixel;
 wire [11:0] pixel_addr_ball;
 wire [11:0] ball_xpos, ball_ypos;
-wire pl1_col;
+wire pl1_col,pl2_col,net_col;
 
 draw_ball my_draw_ball(
 	.rst(rst_d),
@@ -179,7 +181,9 @@ draw_ball my_draw_ball(
 	.pixel_addr(pixel_addr_ball),
 	.xpos(ball_xpos),
 	.ypos(ball_ypos),
-	.pl1_col(pl1_col)
+	.pl1_col(pl1_col),
+	.pl2_col(pl2_col),
+    .net_col(net_col)
 );
 
 ball_rom my_ball_rom (
@@ -192,12 +196,12 @@ ball_pos_ctrl my_ball_pos_ctrl(
 	.rst(rst_d),
 	.clk(clk65MHz),
 	.pl1_col(pl1_col),
-	.pl2_col(1'b0),
-	.net_col(1'b0),
+	.pl2_col(pl2_col),
+	.net_col(net_col),
 	.pl1_posx(my_xpos_limit),
 	.pl1_posy(my_ypos_limit),
-	.pl2_posx(12'b0),
-	.pl2_posy(12'b0),
+	.pl2_posx(800),
+	.pl2_posy(680),
 	.gnd_col(gnd_col),
 	.ovr_touch(thirdtouched),
 	.last_touch(last_touch),
@@ -211,10 +215,10 @@ judge my_judge(
 	.yposball(ball_ypos),
 	.xposball(ball_xpos),
 	.collisionsplayer1(pl1_col),
-	.collisionsplayer2(1'b0),
+	.collisionsplayer2(pl2_col),
 	.clk(clk65MHz),
 	.score_player1(),
-	.score_player2(LED),
+	.score_player2(),
 	.flag_point(),
 	.endgame(),
 	.thirdtouched(thirdtouched)
