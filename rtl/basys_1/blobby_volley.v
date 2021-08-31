@@ -143,7 +143,7 @@ uart my_uart (
   .conv8to16valid(conv8to16valid)
 );
   wire [3:0] score_player1,score_player2;
-  wire [11:0] ball_posx, ball_posy, pl1_posx, pl1_posy,xpos_pl2,ypos_pl2;
+  wire [11:0] ball_posx, ball_posy, pl1_posx, pl1_posy,pl2_posx,pl2_posy;
   wire [3:0] pixel;
   wire [11:0] pixel_addr_ball;
   wire [11:0] ball_xpos, ball_ypos;
@@ -154,8 +154,8 @@ uart_demux my_uart_demux(
   .data(uart_to_reg),       
   .clk(clk65MHz),               
   .rst(rst_d),                
-  .pl2_posx(xpos_pl2),    
-  .pl2_posy(ypos_pl2),
+  .pl2_posx(pl2_posx),    
+  .pl2_posy(pl2_posy),
   .conv8to16valid(conv8to16valid)
 );
   
@@ -228,8 +228,8 @@ wire [13:0] pixel_addr2;
 
 Player_2 my_player2(
 	.rst(rst_d),
-	.xpos(xpos_pl2),       
-  .ypos(ypos_pl2),       
+	.xpos(pl2_posx),       
+  .ypos(pl2_posy),       
   .mouse_click(my_mouse_left_limit),
 	.pclk(clk65MHz),
 	.vga_in(vga_bus[1]),

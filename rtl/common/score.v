@@ -3,14 +3,14 @@
 module score(
     input wire rst,
     input wire pclk,
-    input wire[7:0] char_pixel,
-    input wire[7:0] char_pixel2,
-    input wire flag_point,
+    input wire [7:0] char_pixel,
+    input wire [7:0] char_pixel2,
+    input wire       flag_point,
     input wire [3:0] bcd01,
     input wire [3:0] bcd02,
     input wire [3:0] bcd11,
     input wire [3:0] bcd12,
-    input wire [`VGA_BUS_SIZE-1:0] vga_in,   
+    input  wire [`VGA_BUS_SIZE-1:0] vga_in,   
     output wire [`VGA_BUS_SIZE-1:0] vga_out,
     output reg [3:0] char_line,
     output reg [6:0] char_code,
@@ -20,22 +20,22 @@ module score(
     wire [11:0] hcount_buf;
     wire hsync_buf;
     wire hblnk_buf;
-    wire [11:0] vcount_buf;
+    wire [11:0]vcount_buf;
     wire vsync_buf;
     wire vblnk_buf;
     wire [11:0] rgb_buf;
-    reg [3:0] char_line_nxt;
+    reg  [3:0] char_line_nxt;
     
     `VGA_SPLIT_INPUT(vga_in)
     `VGA_OUT_REG
     `VGA_MERGE_OUTPUT(vga_out)
     localparam  POSX = 1, 
                   POSY = 0,
-                  POSX2 = 1002, 
+                  POSX2 = 922, 
                   POSY2 = 0,
-                  WIDTH = 25,
-                  HEIGHT = 16,
-                  COLOR = 12'hc_8_3;
+                  WIDTH = 100,
+                  HEIGHT = 50,
+                  COLOR = 12'hf_f_3;
                   
     delay #(.WIDTH(40), .CLK_DEL(2))
     my_delay
@@ -76,14 +76,14 @@ module score(
     reg [7:0]  char_xy_nxt,char_xy_nxt2;
     always  @* begin 
     
-            char_line_nxt = vcount_in[3:0];
+            char_line_nxt = vcount_in[5:2];
             if ((hcount_in >= POSX && hcount_in <=POSX+WIDTH)&&(vcount_in >= POSY && vcount_in <=POSY+HEIGHT))begin                            
-                  if (char_pixel[8-hcount_buf%8])
+                  if (char_pixel[8-hcount_buf[4:2]%8])
                       rgb_out_char_nxt = COLOR;
                   else
                       rgb_out_char_nxt = 12'h3BE; 
             end else if ((hcount_in >= POSX2 && hcount_in <=POSX2+WIDTH)&&(vcount_in >= POSY2 && vcount_in <=POSY2+HEIGHT))begin   
-                  if (char_pixel2[8-hcount_buf%8])                                                                         
+                  if (char_pixel2[8-hcount_buf[4:2]%8])                                                                         
                       rgb_out_char_nxt = COLOR;                                                                           
                   else                                                                                                    
                       rgb_out_char_nxt = 12'h3BE;                                                                       
@@ -112,7 +112,7 @@ module score(
 
     always @* begin
        
-          case(hcount_in[4:3])
+          case(hcount_in[6:5])
             2'b00 : begin 
                 char_code_nxt = 7'h30+bcd11;
                     char_code_nxt2 = 7'h00;
