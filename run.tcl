@@ -44,24 +44,28 @@ read_vhdl {
 	rtl/common/Ps2Interface.vhd
 }
 read_verilog {
-    rtl/basys_1/blobby_volley.v
-    rtl/common/vga_timing.v
+  rtl/basys_1/blobby_volley.v
+  rtl/common/vga_timing.v
 	rtl/common/draw_background.v
 	rtl/common/reset.v
 	rtl/basys_1/clock.v
 	rtl/basys_1/clock_clk_wiz.v
 	rtl/common/player1_rom.v
-    rtl/common/Player_2.v
+  rtl/common/Player_2.v
 	rtl/common/delay.v
 	rtl/common/_vga_macros.vh
+	rtl/common/Player_2.v
 	rtl/common/player1.v
 	rtl/common/mouse_limit_player.v
 	rtl/common/buffor_signal_mouse.v
 	rtl/common/ball_rom.v
 	rtl/common/draw_ball.v
+	rtl/common/bin2bcd.v
+	rtl/common/font.v
+	rtl/common/score.v
 	rtl/basys_1/ball_pos_ctrl.v
 	rtl/common/clk_divider.v
-    rtl/basys_1/judge.v
+  rtl/basys_1/judge.v
 }
 
 read_mem {
@@ -71,8 +75,8 @@ read_mem {
 }
 
 add_files -fileset sim_1 {
-    sim/testbench.v
-    sim/tiff_writer.v
+  sim/testbench.v
+  sim/tiff_writer.v
 	sim/tb_ball.v
 }
 

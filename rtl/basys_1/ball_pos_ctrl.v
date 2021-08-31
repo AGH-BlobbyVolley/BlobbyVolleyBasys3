@@ -3,26 +3,27 @@
 module ball_pos_ctrl(
     input wire rst,
     input wire clk,
-    (* mark_debug = "true" *) input wire pl1_col,
+    input wire pl1_col,
     input wire pl2_col,
     input wire net_col,
-    (* mark_debug = "true" *) input wire [11:0] pl1_posx,
-    (* mark_debug = "true" *) input wire [11:0] pl1_posy,
+    input wire [11:0] pl1_posx,
+    input wire [11:0] pl1_posy,
     input wire [11:0] pl2_posx,
     input wire [11:0] pl2_posy,
+    input wire ovr_touch,
     input wire last_touch,
     output wire gnd_col,
-    output reg ovr_touch,
     output wire [11:0] ball_posx_out,
     output wire [11:0] ball_posy_out
   );
 
-  reg pl1_col_d, pl1_col_d_nxt, pl2_col_d, pl2_col_d_nxt;
+  (* mark_debug = "true" *)reg pl1_col_d, pl1_col_d_nxt, pl2_col_d, pl2_col_d_nxt,net_col_d_nxt,net_col_d;
   wire [11:0] pl1_posx_int,  pl1_posy_int, pl2_posx_int,  pl2_posy_int;
   reg [3:0] ball_state, ball_state_nxt;
   wire clk100Hz;
   wire [18:0] div_count;
-
+  (* mark_debug = "true" *)reg ovr_touch_d_nxt , ovr_touch_d; 
+  
   clk_divider #(.FREQ(100), .SRC_FREQ(65_000_000)) my_clk_divider(
                 .clk_in(clk),
                 .rst(rst),
@@ -46,8 +47,23 @@ module ball_pos_ctrl(
     else
       pl2_col_d <= pl2_col_d_nxt;
   end
-
-
+  
+  always @(posedge clk)
+  begin
+    if(rst)
+      net_col_d <= 0;
+    else
+      net_col_d <= net_col_d_nxt;
+  end
+  
+  always @(posedge clk)
+  begin
+    if(rst)
+      ovr_touch_d <= 0;
+    else
+      ovr_touch_d <= ovr_touch_d_nxt;
+  end
+  
   always @*
   begin
     if(pl1_col)
@@ -57,7 +73,17 @@ module ball_pos_ctrl(
     else
       pl1_col_d_nxt = (div_count==16'hFFFF && ~clk100Hz) ? 0 : pl1_col_d;
   end
-
+  
+  always @*
+  begin
+    if(net_col)
+      net_col_d_nxt = 1;
+    else if(ball_state==BOUNCE)
+      net_col_d_nxt = 0;
+    else
+      net_col_d_nxt = (div_count==16'hFFFF && ~clk100Hz) ? 0 : net_col_d;
+  end
+  
   always @*
   begin
     if(pl2_col)
@@ -66,6 +92,16 @@ module ball_pos_ctrl(
       pl2_col_d_nxt = 0;
     else
       pl2_col_d_nxt = (div_count==16'hFFFF && ~clk100Hz) ? 0 : pl2_col_d;
+  end
+    
+  always @*
+  begin
+    if(ovr_touch)
+      ovr_touch_d_nxt = 1;
+    else if(ball_state==BOUNCE)
+      ovr_touch_d_nxt = 0;
+    else
+      ovr_touch_d_nxt = (div_count==19'hFFFFF && ~clk100Hz) ? 0 : ovr_touch_d;
   end
   //
 
@@ -120,8 +156,8 @@ module ball_pos_ctrl(
 
   //ball position
 
-  (* mark_debug = "true" *) reg signed	[12:-7] ball_posx, ball_posx_nxt;
-  (* mark_debug = "true" *) reg signed 	[12:-7] ball_posy, ball_posy_nxt;
+   reg signed	[12:-7] ball_posx, ball_posx_nxt;
+   reg signed 	[12:-7] ball_posy, ball_posy_nxt;
 
   assign ball_posx_out = ball_posx[11:0];
   assign ball_posy_out = ball_posy[11:0];
@@ -175,17 +211,14 @@ module ball_pos_ctrl(
           ball_state_nxt=HANG;
       end
       BOUNCE:
-        if(ovr_touch)
-          ball_state_nxt=WAIT;
-        else
           ball_state_nxt=FLIGHT;
       FLIGHT:
       begin
         if((pl1_col_d || pl2_col_d) && ghost_time_done)
           ball_state_nxt=BOUNCE;
-        else if(wall_col || net_col)
+        else if(wall_col || (net_col_d && ghost_time_done) )
           ball_state_nxt=BOUNCE;
-        else if(gnd_col)
+        else if(gnd_col || ovr_touch_d)
           ball_state_nxt=WAIT;
         else
           ball_state_nxt=FLIGHT;
@@ -207,16 +240,17 @@ module ball_pos_ctrl(
               PL1_COL = 3'b001,
               PL2_COL = 3'b010,
               WALL_COL= 3'b011,
-              GND_COL = 3'b100;
+              GND_COL = 3'b100,
+              NET_COL = 3'b110;
 
 
-  reg [1:0] last_collision, last_collision_nxt;
+  (* mark_debug = "true" *) reg [2:0] last_collision, last_collision_nxt;
 
 
   always @(posedge clk100Hz)
   begin
     if(rst_d)
-      last_collision <= 2'b0;
+      last_collision <= 3'b0;
     else
       last_collision <= last_collision_nxt;
   end
@@ -230,8 +264,9 @@ module ball_pos_ctrl(
       FLIGHT:
         last_collision_nxt = 	pl1_col_d ? PL1_COL :
           pl2_col_d ? PL2_COL :
-            wall_col ? WALL_COL :
-              GND_COL ? GND_COL : NON_COL;
+            wall_col  ? WALL_COL :
+                net_col_d ?  NET_COL :
+                    GND_COL ? GND_COL : NON_COL;
       default:
         last_collision_nxt = last_collision;
     endcase
@@ -294,7 +329,7 @@ module ball_pos_ctrl(
     end
   end
 
-  wire [12:0] vel_x_calc, vel_y_calc;
+  (* mark_debug = "true" *)wire [12:0] vel_x_calc, vel_y_calc;
   assign vel_x_calc = (~{1'b0, ((last_collision==PL1_COL) ? pl1_posx_int : pl2_posx_int)} +   ball_posx[12:0]  + (BALL_CENTER_POS + 1 - PL_CENTER_POSX));
   assign vel_y_calc = ( {1'b0, ((last_collision==PL1_COL) ? pl1_posy_int : pl2_posy_int)} + ~(ball_posy[12:0]) + (PL_CENTER_POSY + 1 - BALL_CENTER_POS));
 
@@ -304,7 +339,12 @@ module ball_pos_ctrl(
       BOUNCE:
       begin
         case(last_collision)
-          PL1_COL || PL2_COL:
+          PL1_COL :
+          begin
+            vel_x_nxt = vel_x_calc[12] ? {3'hF, vel_x_calc, 4'b0} : {3'h0, vel_x_calc, 4'b0};
+            vel_y_nxt = vel_y_calc[12] ? {3'hF, vel_y_calc, 4'b0} : {3'h0, vel_y_calc, 4'b0};
+          end
+          PL2_COL:
           begin
             vel_x_nxt = vel_x_calc[12] ? {3'hF, vel_x_calc, 4'b0} : {3'h0, vel_x_calc, 4'b0};
             vel_y_nxt = vel_y_calc[12] ? {3'hF, vel_y_calc, 4'b0} : {3'h0, vel_y_calc, 4'b0};
@@ -313,6 +353,17 @@ module ball_pos_ctrl(
           begin
             vel_x_nxt = ~vel_x + 1;
             vel_y_nxt = vel_y;
+          end
+          NET_COL:
+          begin
+          if( ball_posy <= $signed(430) )begin
+                vel_x_nxt = vel_x;
+                vel_y_nxt = ~vel_y+1;
+          end
+            else begin
+                vel_x_nxt = ~vel_x+1 ;
+                vel_y_nxt = vel_y;
+            end
           end
           default:
           begin
