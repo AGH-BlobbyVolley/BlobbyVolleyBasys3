@@ -5,14 +5,13 @@
 module draw_background (
     input wire rst,
     input wire pclk,
-    input wire [3:0] scorepl1,
-    input wire [3:0] scorepl2,
     input wire [11:0] hcount_in,
     input wire hsync_in,
     input wire hblnk_in,
     input wire [11:0] vcount_in,
     input wire vsync_in,
     input wire vblnk_in,
+    input wire [7:0] char_line_pixels,
     output wire [`VGA_BUS_SIZE-1:0] vga_out
   );
 
@@ -51,9 +50,8 @@ end
 always @* begin
 	if(hblnk_in | vblnk_in) rgb_out_nxt = 12'h0_0_0;
 	else begin
-		if(vcount_in<=6 || (vcount_in>12 && vcount_in<=20)) rgb_out_nxt = 12'h3BE;
+		if( (vcount_in<=28)) rgb_out_nxt = 12'h3BE;
 		else if((hcount_in>500 && hcount_in<=524)&&(vcount_in>450 && vcount_in<=767)) rgb_out_nxt = 12'h888;
-		else if((vcount_in>6 && vcount_in<=12) || (vcount_in>20 && vcount_in<=28)) rgb_out_nxt = 12'h6CF;
 		else if((vcount_in>28 && vcount_in<=462) || (vcount_in>576 && vcount_in<=586)) rgb_out_nxt = 12'h7AD;
 		else if((vcount_in>462 && vcount_in<=474)) rgb_out_nxt = 12'hBDF;
 		else if((vcount_in>474 && vcount_in<=483)) rgb_out_nxt = 12'h05A;
@@ -66,30 +64,5 @@ always @* begin
 	end
 	
 end
-/*
-always @* begin
-	if(hblnk_in | vblnk_in) rgb_out_nxt = 12'h0_0_0;
-	else begin
-	   case(scorepl1)
-	   4'b0000:
-	   4'b0001:
-	   4'b0010:
-	   4'b0011:
-	   4'b0100:
-	   4'b0101:
-	   4'b0110:
-	   4'b0111:
-	   4'b1000:
-	   4'b1001:
-	   4'b1010:
-	   4'b1011:
-	   4'b1100:
-	   4'b1101:
-	   4'b1110:
-	   4'b1111:
-	   endcase
-	end*/
-	
-//end
 
 endmodule

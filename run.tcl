@@ -59,6 +59,9 @@ read_verilog {
 	rtl/common/buffor_signal_mouse.v
 	rtl/common/ball_rom.v
 	rtl/common/draw_ball.v
+	rtl/common/bin2bcd.v
+	rtl/common/font.v
+	rtl/common/score.v
 	rtl/basys_1/ball_pos_ctrl.v
 	rtl/common/clk_divider.v
     	rtl/basys_1/judge.v

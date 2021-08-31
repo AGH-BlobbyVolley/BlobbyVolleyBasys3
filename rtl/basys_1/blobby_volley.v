@@ -69,7 +69,7 @@ clock my_clock
  
  wire [11:0] my_xpos_limit,my_ypos_limit;
  wire my_mouse_left_limit;
- 
+ wire [3:0] bcd01,bcd02,bcd11,bcd12;
  
  mouse_limit_player my_mouse_limit_player(
  .clk(clk65MHz),            
@@ -112,12 +112,10 @@ vga_timing my_timing (
   .hblnk(hblnk),
   .pclk(clk65MHz)
 );
-wire [`VGA_BUS_SIZE-1:0] vga_bus [3:0];
+wire [`VGA_BUS_SIZE-1:0] vga_bus [4:0];
 draw_background my_draw_background (
 	.rst(rst_d),
 	.hcount_in(hcount),
-	.scorepl1(),
-	.scorepl2(),
 	.hsync_in(hsync),
 	.hblnk_in(hblnk),
 	.vcount_in(vcount),
@@ -127,7 +125,39 @@ draw_background my_draw_background (
 
 	.vga_out(vga_bus[0])
   );
-
+  wire [7:0] rgb_char,rgb_char2;
+  wire [6:0] char_code,char_code2;
+  wire [3:0] char_line;
+  wire last_touch,thirdtouched,gnd_col;
+    font_rom my_font_rom(
+      .clk(clk65MHz),
+      .rst(rst_d),
+      .addr({char_code,char_line}),
+      .char_line_pixels(rgb_char)
+      );
+   wire [3:0]score_pl1,score_pl2;
+   score my_score(
+   .rst(rst_d),                           
+   .pclk(clk65MHz),                          
+   .char_pixel(rgb_char),
+   .char_pixel2(rgb_char2),                
+   .bcd01(bcd01), 
+   .flag_point(last_touch),              
+   .bcd02(bcd02),
+   .bcd11(bcd11),
+   .bcd12(bcd12),               
+   .vga_in(vga_bus[3]),    
+   .vga_out(vga_bus[4]),  
+   .char_line(char_line),               
+   .char_code(char_code),
+   .char_code2(char_code2)               
+   );
+   font_rom my_font_rom2(
+     .clk(clk65MHz),
+     .rst(rst_d),
+     .addr({char_code2,char_line}),
+     .char_line_pixels(rgb_char2)
+     ); 
 wire [3:0] rgb_pixel;
 wire [13:0] pixel_addr;
 player1 my_player1(
@@ -191,7 +221,7 @@ ball_rom my_ball_rom (
     .address(pixel_addr_ball),
     .pixel(pixel)
 );
-wire last_touch,thirdtouched,gnd_col;
+
 ball_pos_ctrl my_ball_pos_ctrl(
 	.rst(rst_d),
 	.clk(clk65MHz),
@@ -208,6 +238,16 @@ ball_pos_ctrl my_ball_pos_ctrl(
 	.ball_posx_out(ball_xpos),
 	.ball_posy_out(ball_ypos)
 );
+bin2bcd bin2bcd_my1(
+ .bin(score_pl1),  
+ .bcd0(bcd01),
+ .bcd1(bcd11)
+);
+bin2bcd bin2bcd_my2(
+ .bin(score_pl2),  
+ .bcd0(bcd02),
+ .bcd1(bcd12)
+);
 
 judge my_judge(
 	.rst(rst_d),
@@ -217,15 +257,15 @@ judge my_judge(
 	.collisionsplayer1(pl1_col),
 	.collisionsplayer2(pl2_col),
 	.clk(clk65MHz),
-	.score_player1(),
-	.score_player2(),
-	.flag_point(),
+	.score_player1(score_pl1),
+	.score_player2(score_pl2),
+	.flag_point(last_touch),
 	.endgame(),
 	.thirdtouched(thirdtouched)
 );
 
-assign vs = vga_bus[3][`VGA_VS_BITS];
-assign hs = vga_bus[3][`VGA_HS_BITS];
-assign {r,g,b} = vga_bus[3][`VGA_RGB_BITS]; 
+assign vs = vga_bus[4][`VGA_VS_BITS];
+assign hs = vga_bus[4][`VGA_HS_BITS];
+assign {r,g,b} = vga_bus[4][`VGA_RGB_BITS]; 
 
 endmodule

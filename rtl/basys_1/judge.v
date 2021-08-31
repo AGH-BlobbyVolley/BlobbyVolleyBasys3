@@ -48,9 +48,9 @@ module judge(
                             
     always @(posedge clk ) begin
         if(rst)begin
-            score_player1<=0;
+            score_player1<=4'b0011;
             score_player2<=0;
-            flag_point<=1'b0;
+            flag_point<=1'bx;
             endgame<=1'b0;
             state<=START;
             touchedplayer1<=0;
@@ -106,7 +106,7 @@ module judge(
         counter_nxt = counter ;
          case(state)
             GAMECONT : begin  //licznik kolizji
-                counter_nxt = ( counter == 24'hF7F490 ) ? 0 : ( (counter == 0 && collisionsplayer1) || counter != 0  )? counter + 1 : counter; 
+                counter_nxt = ( counter == 24'hF7F490 ) ? 0 : ( (counter == 0 && (collisionsplayer1 || collisionsplayer2)) || counter != 0  )? counter + 1 : counter; 
                 touchedplayer1_nxt = ( collisionsplayer1 && counter == 0 )? touchedplayer1 + 1 : ( collisionsplayer2 && touchedplayer1 < 4  )? 0 : touchedplayer1;    
                 touchedplayer2_nxt = ( collisionsplayer2 && counter == 0 )? touchedplayer2 + 1 : ( collisionsplayer1 && touchedplayer2 < 4  )? 0 : touchedplayer2;     
                 thirdtouched_nxt = ( touchedplayer2 > 3 || touchedplayer1 > 3 )? 1 : 0;
