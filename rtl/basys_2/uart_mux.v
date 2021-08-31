@@ -1,4 +1,3 @@
-
 module uart_mux (
     input wire clk,
     input wire en,
