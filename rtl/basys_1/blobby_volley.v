@@ -6,13 +6,15 @@ module blobby_volley(
   input wire clk,
   input wire rst,
   input wire test,
+  input wire rx,
   //input wire test,
   output wire vs,
   output wire hs,
   output wire [3:0] r,
   output wire [3:0] g,
   output wire [3:0] b,
-  output wire pclk_mirror , 
+  output wire pclk_mirror,
+  output wire tx
   );
 wire clk100MHz;
 wire clk65MHz;
@@ -81,8 +83,7 @@ clock my_clock
  .xpos_limit(my_xpos_limit),      
  .ypos_limit(my_ypos_limit),      
  .click_mouse_limit(my_mouse_left_limit)
-
- );
+  );
 
 reset my_reset 
 (
@@ -127,6 +128,50 @@ draw_background my_draw_background (
 
 	.vga_out(vga_bus[0])
   );
+wire [15:0] uart_to_reg, reg_to_uart;
+  wire tx_done;
+  wire con_broken;
+  uart my_uart (
+      .clk(clk65MHz),
+      .rst(rst_d),
+      .rx(rx),
+      .tx(tx),
+      .tx_done(tx_done),
+      .data_in(reg_to_uart),
+      .data_out(uart_to_reg),
+      .con_broken(con_broken)
+  );
+  wire [3:0] score_player1,score_player2;
+  wire [11:0] ball_posx, ball_posy, pl1_posx, pl1_posy,xpos_pl2,ypos_pl2;
+  wire [3:0] pixel;
+  wire [11:0] pixel_addr_ball;
+  wire [11:0] ball_xpos, ball_ypos;
+  wire pl1_col;
+  wire last_touch,thirdtouched,gnd_col,endgame;
+  
+  uart_demux my_uart_demux(
+      .data(uart_to_reg),       
+      .clk(clk65MHz),               
+      .rst(rst_d),                
+      .pl2_posx(xpos_pl2),    
+      .pl2_posy(ypos_pl2)
+    );
+  
+  uart_mux my_uart_mux(
+        .data(reg_to_uart),
+        .clk(clk65MHz),
+        .tx_done(tx_done),
+        .rst(rst_d),
+        .pl1_posx(my_xpos_limit),
+        .pl1_posy(my_ypos_limit),
+        .ball_posx(ball_xpos),
+        .ball_posy(ball_ypos),
+        .pl1_score(score_player1),
+        .pl2_score(score_player2),
+        .flag_point(last_touch),
+        .end_game(endgame),
+        .con_broken(con_broken)
+    );
 
   wire [7:0] rgb_char,rgb_char2;
   wire [6:0] char_code,char_code2;
@@ -181,9 +226,9 @@ wire [13:0] pixel_addr2;
 
 Player_2 my_player2(
 	.rst(rst_d),
-	.xpos(800),       
-    .ypos(680),
-    .mouse_click(my_mouse_left_limit),
+	.xpos(xpos_pl2),       
+  .ypos(ypos_pl2),       
+  .mouse_click(my_mouse_left_limit),
 	.pclk(clk65MHz),
 	.vga_in(vga_bus[1]),
 	.vga_out(vga_bus[2]),
@@ -228,6 +273,7 @@ ball_rom my_ball_rom (
     .pixel(pixel)
 );
 
+
 ball_pos_ctrl my_ball_pos_ctrl(
 	.rst(rst_d),
 	.clk(clk65MHz),
@@ -236,8 +282,8 @@ ball_pos_ctrl my_ball_pos_ctrl(
 	.net_col(net_col),
 	.pl1_posx(my_xpos_limit),
 	.pl1_posy(my_ypos_limit),
-	.pl2_posx(800),
-	.pl2_posy(680),
+	.pl2_posx(pl2_posx),
+	.pl2_posy(pl2_posy),
 	.gnd_col(gnd_col),
 	.ovr_touch(thirdtouched),
 	.last_touch(last_touch),
