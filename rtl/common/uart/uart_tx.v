@@ -47,6 +47,7 @@ module uart_tx
          end
 
    // FSMD next-state logic & functional units
+   //! fsm_extract
    always @*
    begin
       state_next = state_reg;

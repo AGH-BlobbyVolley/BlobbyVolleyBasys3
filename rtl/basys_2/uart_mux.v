@@ -5,25 +5,35 @@ module uart_mux (
     input wire [11:0] pl1_posy,
     input wire [11:0] pl2_posx,
     input wire [11:0] pl2_posy,
-    input wire [11:0] ball_posx,
-    input wire [11:0] ball_posy,
-    input wire [3:0] pl1_score,
-    input wire [3:0] pl2_score,
-    input wire flag_point,
-    input wire end_game,
-    output wire [15:0] data,
+    input wire start_game,
+    //mux output
+    output reg [15:0] data,
+    input wire conv16to8ready
   );
 
-  localparam  PL1_POSX = 4'h1,
-              PL1_POSY = 4'h2,
-              PL2_POSX = 4'h3,
-              PL2_POSY = 4'h4,
-              BALL_POSX = 4'h5,
-              BALL_POSY = 4'h6,
-              MATCH_CTRL = 4'h7;
+  localparam  PL2_POSX = 4'h1,
+              PL2_POSY = 4'h2,
+              MATCH_CTRL = 4'h3;
 
 wire [3:0] sel,sel_nxt;
 wire [15:0] data_nxt;
+
+  always @(posedge clk)
+  begin
+    if(rst)
+    begin
+      sel <= 4'hF;
+    end
+    else
+    begin
+      sel <= sel_nxt;
+    end
+
+  always @*
+  begin
+    sel_nxt = (tx_done & conv16to8ready) ? sel + 1 : sel;
+  end
+  reg [15:0] data_nxt;
 
   always @(posedge clk)
   begin
@@ -35,24 +45,8 @@ wire [15:0] data_nxt;
     begin
       data <= data_nxt;
     end
-
   end
 
-  always @(posedge clk)
-    begin
-      if(rst)
-      begin
-        sel <= 0;
-      end 
-      else if(en)
-          sel <= sel_nxt;
-      else  
-          sel <= sel; // sprawdzic!!
-    end
-
-  always @* begin 
-      sel_nxt = (sel==4'h8)?  4'h0 : sel + 4'h1;  
-  end   
 
   always @*
   begin
