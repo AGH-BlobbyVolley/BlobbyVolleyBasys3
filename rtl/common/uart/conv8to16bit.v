@@ -1,48 +1,58 @@
 module conv8to16bit (
-	input wire clk,
-	input wire rst,
-	input wire tick,
-	input wire [7:0] din,
-	output reg [15:0] dout
-);
+    input wire clk,
+    input wire rst,
+    input wire clk_tick,
+    input wire data_tick,
+    input wire [7:0] din,
+    output reg [15:0] dout,
+    output reg valid
+  );
 
-reg [7:0] dout_msb, dout_msb_nxt;
-reg [7:0] dout_lsb, dout_lsb_nxt;
-reg [15:0] dout_nxt;
-reg valid;
-wire valid_nxt;
+  reg [1:0] word_nr, word_nr_nxt;
 
-always @(posedge clk) begin
-	if(rst) valid <= 0;
-	else valid <= valid_nxt;
-end
+  reg [15:0] dout_nxt;
+  reg valid_nxt;
+  reg [5:0] tick_cnt, tick_cnt_nxt;
 
-always @(posedge clk) begin
-	if(rst) dout <= 0;
-	else dout <= dout_nxt;
-end
+  always @(posedge clk)
+  begin
+    if(rst)
+      valid <= 0;
+    else
+      valid <= valid_nxt;
+  end
 
-always @* begin
-    if(valid) dout_nxt = dout;
-    else dout_nxt = {dout_msb, dout_lsb};
-end
+  always @(posedge clk)
+  begin
+    if(rst)
+      dout <= 0;
+    else
+      dout <= dout_nxt;
+  end
 
-assign valid_nxt = tick ? ~valid : valid;
+  always @*
+  begin
+    dout_nxt = dout;
+    valid_nxt = valid;
+    if(data_tick)
+      case(din[7:6])
+        2'b00: begin
+          dout_nxt = 16'b0;
+          valid_nxt = 1'b0;
+        end
+        2'b01: begin
+          dout_nxt = {din[5:2], dout[11:0]};
+          valid_nxt = 1'b0;
+        end
+        2'b10: begin
+          dout_nxt = {dout[15:12], din[5:0], dout[5:0]};
+          valid_nxt = 1'b0;
+        end
+        2'b11: begin 
+          dout_nxt = {dout[15:6], din[5:0]};
+          valid_nxt = 1'b1;
+        end
+      endcase
+  end
 
-always @(posedge clk) begin
-	if(rst) begin
-		dout_msb <= 0;
-		dout_lsb <= 0;
-	end
-	else begin
-		dout_msb <= dout_msb_nxt;
-		dout_lsb <= dout_lsb_nxt;
-	end
-end
-	
-always @* begin
-    if(tick) {dout_msb_nxt, dout_lsb_nxt} = valid ? {din, dout_lsb} : {dout_msb, din};
-    else {dout_msb_nxt, dout_lsb_nxt} = {dout_msb, dout_lsb};
-end
-	
 endmodule

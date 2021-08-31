@@ -68,7 +68,6 @@ clock my_clock
  .my_ypos_buf(my_ypos_buf)
  );
  
- 
  wire [11:0] my_xpos_limit,my_ypos_limit;
  wire my_mouse_left_limit;
 
@@ -127,6 +126,7 @@ draw_background my_draw_background (
 
 wire [15:0] uart_to_reg, reg_to_uart;
 wire tx_done;
+wire conv8to16valid, conv16to8ready;
 
 uart my_uart (
 	.clk(clk65MHz),
@@ -135,7 +135,9 @@ uart my_uart (
 	.tx(tx),
   .tx_done(tx_done),
 	.data_in(reg_to_uart),
-	.data_out(uart_to_reg)
+	.data_out(uart_to_reg),
+  .conv16to8ready(conv16to8ready),
+  .conv8to16valid(conv8to16valid)
 );
 
 wire [11:0] ball_posx, ball_posy, pl1_posx, pl1_posy;
@@ -146,20 +148,20 @@ uart_demux my_uart_demux(
     .rst(rst_d),
     .pl1_posx(pl1_posx),
     .pl1_posy(pl1_posy),
-    .pl2_posx(),
-    .pl2_posy(),
     .ball_posx(ball_posx),
     .ball_posy(ball_posy),
     .pl1_score(),
     .pl2_score(),
     .flag_point(),
-    .end_game()
+    .end_game(),
+    .conv8to16valid(conv8to16valid)
   );
 
 uart_mux my_uart_mux(
     .clk(clk65MHz),
     .rst(rst_d),
     .tx_done(tx_done),
+    .conv16to8ready(conv16to8ready),
     //input data to mux
     .pl2_posx(my_xpos_limit),
     .pl2_posy(my_ypos_limit),
