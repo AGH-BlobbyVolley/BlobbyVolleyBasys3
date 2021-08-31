@@ -10,20 +10,15 @@ module uart_mux (
     input wire [3:0] pl2_score,
     input wire flag_point,
     input wire end_game,
-    input wire con_broken,
-    output reg [15:0] data
+    output reg [15:0] data,
+    input wire conv16to8ready
   );
 
-  localparam KEYWORD = 8'b00001111;
-
-  localparam  SYNC = 4'h0,
-              PL1_POSX = 4'h1,
-              PL1_POSY = 4'h2,
+  localparam  PL1_POSX = 4'h3,
+              PL1_POSY = 4'h4,
               BALL_POSX = 4'h5,
               BALL_POSY = 4'h6,
               MATCH_CTRL = 4'h7;
-
-  reg nd_time, nd_time_nxt = 1'b0;
 
   reg [3:0] sel, sel_nxt;
 
@@ -31,20 +26,17 @@ module uart_mux (
   begin
     if(rst)
     begin
-      sel <= 4'b0;
-      nd_time <= 1'b0;
+      sel <= 4'hF;
     end
     else
     begin
       sel <= sel_nxt;
-      nd_time <= nd_time_nxt;
     end
   end
 
   always @*
   begin
-    sel_nxt = con_broken ? 4'b0 : (tx_done & (~nd_time)) ? sel + 1 : sel;
-    nd_time_nxt = tx_done ? ~nd_time : nd_time;
+    sel_nxt = (tx_done & conv16to8ready) ? sel + 1 : sel;
   end
   reg [15:0] data_nxt;
 
@@ -58,15 +50,11 @@ module uart_mux (
     begin
       data <= data_nxt;
     end
-
   end
 
   always @*
   begin
-
-    case(sel[3:0])
-      SYNC:
-        data_nxt = {KEYWORD, 8'b0};
+    case(sel)
       PL1_POSX:
         data_nxt = {sel,pl1_posx};
       PL1_POSY:

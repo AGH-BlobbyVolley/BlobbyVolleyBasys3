@@ -48,8 +48,8 @@ read_vhdl {
 	rtl/common/Ps2Interface.vhd
 }
 read_verilog {
-    	rtl/basys_1/blobby_volley.v
-    	rtl/common/vga_timing.v
+	rtl/basys_1/blobby_volley.v
+	rtl/common/vga_timing.v
 	rtl/common/draw_background.v
 	rtl/common/reset.v
 	rtl/basys_1/clock.v
@@ -64,16 +64,19 @@ read_verilog {
 	rtl/common/draw_ball.v
 	rtl/basys_1/ball_pos_ctrl.v
 	rtl/common/clk_divider.v
-    	rtl/basys_1/judge.v
+	rtl/basys_1/judge.v
 	rtl/common/uart/uart_rx.v
-    	rtl/common/uart/uart_tx.v
-    	rtl/common/uart/uart.v
-    	rtl/common/uart/mod_m_counter.v
-    	rtl/common/uart/conv16to8bit.v
-    	rtl/common/uart/conv8to16bit.v
-    	rtl/basys_1/uart_demux.v
+	rtl/common/uart/uart_tx.v
+	rtl/common/uart/uart.v
+	rtl/common/uart/mod_m_counter.v
+	rtl/common/uart/conv16to8bit.v
+	rtl/common/uart/conv8to16bit.v
+	rtl/basys_1/uart_demux.v
 	rtl/basys_1/uart_mux.v
 	rtl/common/Player_2.v
+	rtl/common/bin2bcd.v
+	rtl/common/font.v
+	rtl/common/score.v
 }
 
 read_mem {

@@ -130,17 +130,18 @@ draw_background my_draw_background (
   );
 wire [15:0] uart_to_reg, reg_to_uart;
   wire tx_done;
-  wire con_broken;
-  uart my_uart (
-      .clk(clk65MHz),
-      .rst(rst_d),
-      .rx(rx),
-      .tx(tx),
-      .tx_done(tx_done),
-      .data_in(reg_to_uart),
-      .data_out(uart_to_reg),
-      .con_broken(con_broken)
-  );
+wire conv8to16valid, conv16to8ready;
+uart my_uart (
+  .clk(clk65MHz),
+  .rst(rst_d),
+  .rx(rx),
+  .tx(tx),
+  .tx_done(tx_done),
+  .data_in(reg_to_uart),
+  .data_out(uart_to_reg),
+  .conv16to8ready(conv16to8ready),
+  .conv8to16valid(conv8to16valid)
+);
   wire [3:0] score_player1,score_player2;
   wire [11:0] ball_posx, ball_posy, pl1_posx, pl1_posy,xpos_pl2,ypos_pl2;
   wire [3:0] pixel;
@@ -149,29 +150,30 @@ wire [15:0] uart_to_reg, reg_to_uart;
   wire pl1_col;
   wire last_touch,thirdtouched,gnd_col,endgame;
   
-  uart_demux my_uart_demux(
-      .data(uart_to_reg),       
-      .clk(clk65MHz),               
-      .rst(rst_d),                
-      .pl2_posx(xpos_pl2),    
-      .pl2_posy(ypos_pl2)
-    );
+uart_demux my_uart_demux(
+  .data(uart_to_reg),       
+  .clk(clk65MHz),               
+  .rst(rst_d),                
+  .pl2_posx(xpos_pl2),    
+  .pl2_posy(ypos_pl2),
+  .conv8to16valid(conv8to16valid)
+);
   
-  uart_mux my_uart_mux(
-        .data(reg_to_uart),
-        .clk(clk65MHz),
-        .tx_done(tx_done),
-        .rst(rst_d),
-        .pl1_posx(my_xpos_limit),
-        .pl1_posy(my_ypos_limit),
-        .ball_posx(ball_xpos),
-        .ball_posy(ball_ypos),
-        .pl1_score(score_player1),
-        .pl2_score(score_player2),
-        .flag_point(last_touch),
-        .end_game(endgame),
-        .con_broken(con_broken)
-    );
+uart_mux my_uart_mux(
+  .data(reg_to_uart),
+  .clk(clk65MHz),
+  .tx_done(tx_done),
+  .rst(rst_d),
+  .pl1_posx(my_xpos_limit),
+  .pl1_posy(my_ypos_limit),
+  .ball_posx(ball_xpos),
+  .ball_posy(ball_ypos),
+  .pl1_score(score_player1),
+  .pl2_score(score_player2),
+  .flag_point(last_touch),
+  .end_game(endgame),
+  .conv16to8ready(conv16to8ready)
+);
 
   wire [7:0] rgb_char,rgb_char2;
   wire [6:0] char_code,char_code2;

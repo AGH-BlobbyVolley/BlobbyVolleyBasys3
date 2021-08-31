@@ -1,8 +1,12 @@
+/*--------------------------------------*/
+/*      AUTHOR - Stanisław Klat         */
+/*--------------------------------------*/
+
 module uart_mux (
     input wire clk,
-    input wire en,
-    input wire [11:0] pl1_posx,
-    input wire [11:0] pl1_posy,
+    input wire rst,
+    input wire tx_done,
+    //input data to mux
     input wire [11:0] pl2_posx,
     input wire [11:0] pl2_posy,
     input wire start_game,
@@ -15,8 +19,7 @@ module uart_mux (
               PL2_POSY = 4'h2,
               MATCH_CTRL = 4'h3;
 
-wire [3:0] sel,sel_nxt;
-wire [15:0] data_nxt;
+  reg [3:0] sel, sel_nxt;
 
   always @(posedge clk)
   begin
@@ -28,6 +31,7 @@ wire [15:0] data_nxt;
     begin
       sel <= sel_nxt;
     end
+  end
 
   always @*
   begin
@@ -45,30 +49,22 @@ wire [15:0] data_nxt;
     begin
       data <= data_nxt;
     end
+
   end
 
 
   always @*
   begin
-    case(sel[3:0])
-      begin
-        PL1_POSX:
-          data_nxt = {PL1_POSX,pl1_posx};
-        PL1_POSY:
-          data_nxt = {PL1_POSY,pl1_posy};
-        PL2_POSX:
-          data_nxt = {PL2_POSX,pl2_posx};
-        PL2_POSY:
-          data_nxt = {PL2_POSY,pl2_posy};
-        BALL_POSX:
-          data_nxt = {BALL_POSX,ball_posx};
-        BALL_POSY:
-          data_nxt = {BALL_POSY,ball_posy};
-        MATCH_CTRL:
-        begin
-          data_nxt = {MATCH_CTRL,end_game,flag_point,pl2_score_nxt,pl1_score_nxt};
-        end
-      endcase
-    end
+    case(sel)
+      PL2_POSX:
+        data_nxt = {sel, pl2_posx};
+      PL2_POSY:
+        data_nxt = {sel, pl2_posy};
+      MATCH_CTRL:
+        data_nxt = {sel, 11'b0, start_game};
+      default:
+        data_nxt = 16'b0;
+    endcase
+  end
 
-  endmodule
+endmodule

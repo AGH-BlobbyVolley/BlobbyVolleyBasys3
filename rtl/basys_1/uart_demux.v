@@ -3,11 +3,13 @@ module uart_demux (
     input wire clk,
     input wire rst,
     output reg [11:0] pl2_posx,
-    output reg [11:0] pl2_posy
+    output reg [11:0] pl2_posy,
+    input wire conv8to16valid
   );
 
-  localparam  PL2_POSX = 4'h3,
-              PL2_POSY = 4'h4;
+  localparam  PL2_POSX = 4'h1,
+              PL2_POSY = 4'h2,
+              SYNC = 4'hF;
              
 
 
@@ -35,12 +37,13 @@ reg flag_point_nxt, end_game_nxt;
   begin
     pl2_posx_nxt = pl2_posx;
     pl2_posy_nxt = pl2_posy;
-    case(data[15:12])
-      PL2_POSX:
-        pl2_posx_nxt = data[11:0];
-      PL2_POSY:
-        pl2_posy_nxt = data[11:0];
-    endcase
-    end
+    if(conv8to16valid)
+      case(data[15:12])
+        PL2_POSX:
+          pl2_posx_nxt = data[11:0];
+        PL2_POSY:
+          pl2_posy_nxt = data[11:0];
+      endcase
+  end
 
   endmodule
