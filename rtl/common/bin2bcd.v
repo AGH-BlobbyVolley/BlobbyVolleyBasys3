@@ -14,12 +14,11 @@ module bin2bcd (
         bcd1 = 0;
 
         
-        for ( i = 15; i >= 0; i = i - 1 )
+        for ( i = 3; i >= 0; i = i - 1 )
         begin
             if( bcd0 > 4 ) bcd0 = bcd0 + 3;
             if( bcd1 > 4 ) bcd1 = bcd1 + 3;
-            { bcd1[3:0], bcd0[3:0] } =
-            { bcd1[2:0], bcd0[3:0],bin[i] };
+            { bcd1[3:0], bcd0[3:0] } = { bcd1[2:0], bcd0[3:0],bin[i] };
         end
 
     end

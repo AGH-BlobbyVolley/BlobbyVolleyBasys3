@@ -81,12 +81,12 @@ module score(
                   if (char_pixel[8-hcount_buf[4:2]%8])
                       rgb_out_char_nxt = COLOR;
                   else
-                      rgb_out_char_nxt = 12'h3BE; 
+                      rgb_out_char_nxt = rgb_buf; 
             end else if ((hcount_in >= POSX2 && hcount_in <=POSX2+WIDTH)&&(vcount_in >= POSY2 && vcount_in <=POSY2+HEIGHT))begin   
                   if (char_pixel2[8-hcount_buf[4:2]%8])                                                                         
                       rgb_out_char_nxt = COLOR;                                                                           
                   else                                                                                                    
-                      rgb_out_char_nxt = 12'h3BE;                                                                       
+                      rgb_out_char_nxt = rgb_buf;                                                                       
            end else                                                                                                         
                       rgb_out_char_nxt = rgb_buf ;
               
