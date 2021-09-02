@@ -77,6 +77,10 @@ read_verilog {
 	rtl/common/bin2bcd.v
 	rtl/common/font.v
 	rtl/common/score.v
+	rtl/common/menu.v
+	rtl/common/grey_out.v
+	rtl/common/start_writing.v
+	rtl/common/Mouse_Display.vhd
 }
 
 read_mem {

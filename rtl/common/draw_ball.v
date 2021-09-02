@@ -7,6 +7,7 @@
 `include "_vga_macros.vh"
 
 module draw_ball (
+    input wire en,
     input wire rst,
     input wire pclk,
     
