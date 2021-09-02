@@ -162,7 +162,7 @@ uart_demux my_uart_demux(
     .pl1_score(score_pl1),
     .pl2_score(score_pl2),
     .flag_point(last_touch),
-    .end_game(),
+    .end_game(endgame),
     .conv8to16valid(conv8to16valid)
   );
 
@@ -255,7 +255,9 @@ menu my_menu(
     .left(my_mouse_left_buf),                           
     .xpos(my_xpos_buf),                           
     .ypos(my_ypos_buf),                           
-    .enable_menu(enable_menu),                    
+    .enable_menu(enable_menu),
+    .endgame(endgame), 
+    .flag_point(last_touch),                     
     .enable_game(),                    
     .vga_in_menu(vga_bus[2]),     
     .vga_out(vga_bus[5]),    

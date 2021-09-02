@@ -10,6 +10,7 @@ module grey_out (
     input wire rst,
     input wire pclk,
     input wire [7:0] char_pixel,
+    input wire endgame,
     input wire [`VGA_BUS_SIZE-1:0] vga_in,
     output reg [3:0] char_line,
     output reg [7:0] char_xy,
@@ -41,9 +42,9 @@ module grey_out (
   );
 
   
-  localparam 	WIDTH = 350,
-                POSY = 360,
-                POSX = 360,
+  localparam 	WIDTH = 390,
+                POSY = 330,
+                POSX = 340,
                 COLOR = 12'hf_f_3, 
                 HEIGHT = 50;
 
@@ -85,9 +86,13 @@ module grey_out (
 
   always @*
   begin
+  
     vcount_rect = vcount_in -  POSY;
     hcount_rect = hcount_in -  POSX;
-    char_xy_nxt = {4'b0000,hcount_rect[8:5]};
+    if (endgame)
+        char_xy_nxt = {hcount_rect[8:5],4'b0000};
+    else
+        char_xy_nxt = {4'b0000,hcount_rect[8:5]};
     
     char_line_nxt = vcount_rect[5:2];
     if ((hcount_in >= POSX && hcount_in <=POSX+WIDTH)&&(vcount_in >= POSY && vcount_in <=POSY+HEIGHT))begin                            

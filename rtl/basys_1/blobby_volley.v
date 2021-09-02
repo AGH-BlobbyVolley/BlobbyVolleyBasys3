@@ -248,7 +248,9 @@ menu my_menu(
     .left(my_mouse_left_buf),                           
     .xpos(my_xpos_buf),                           
     .ypos(my_ypos_buf),                           
-    .enable_menu(enable_menu),                    
+    .enable_menu(enable_menu), 
+    .endgame(endgame), 
+    .flag_point(last_touch),                  
     .enable_game(),                    
     .vga_in_menu(vga_bus[2]),     
     .vga_out(vga_bus[5]),    
@@ -332,7 +334,7 @@ judge my_judge(
 	.score_player1(score_pl1),
 	.score_player2(score_pl2),
 	.flag_point(last_touch),
-	.endgame(),
+	.endgame(endgame),
 	.thirdtouched(thirdtouched)
 );
 

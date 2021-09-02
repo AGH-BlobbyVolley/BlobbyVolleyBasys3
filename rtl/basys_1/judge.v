@@ -48,9 +48,9 @@ module judge(
                             
     always @(posedge clk ) begin
         if(rst)begin
-            score_player1<=4'b0011;
+            score_player1<=4'b0000;
             score_player2<=0;
-            flag_point<=1'bx;
+            flag_point<=1'b0;
             endgame<=1'b0;
             state<=START;
             touchedplayer1<=0;
