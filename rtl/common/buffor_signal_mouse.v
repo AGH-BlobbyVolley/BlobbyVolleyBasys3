@@ -14,15 +14,8 @@ module buffor_signal_mouse(
     );
 
 always @(posedge pclk) begin
-           if(rst) begin
-                   my_xpos_buf <= 0;
-                   my_ypos_buf <= 0;
-                   my_left_buf <= 0;
-               end
-           else begin
-                   my_xpos_buf <= my_xpos;
-                   my_ypos_buf <= my_ypos;
-                   my_left_buf <= my_left;
-          end
-    end
+    my_xpos_buf <= my_xpos;
+    my_ypos_buf <= my_ypos;
+    my_left_buf <= my_left;
+end
 endmodule

@@ -56,15 +56,11 @@ clock my_clock
   wire [11:0] my_xpos_buf,my_ypos_buf;
   wire my_mouse_left_buf;
  
- buffor_signal_mouse my_buffor_signal_mouse( 
- .pclk(clk65MHz),            
- .rst(rst),             
- .my_left(my_mouse_left),         
- .my_xpos(my_xpos),  
- .my_ypos(my_ypos),  
- .my_left_buf(my_mouse_left_buf),     
- .my_xpos_buf(my_xpos_buf),
- .my_ypos_buf(my_ypos_buf)
+ delay #(.WIDTH(25), .CLK_DEL(2)) my_buffor_signal_mouse( 
+ .clk(clk65MHz),            
+ .rst(rst_d),             
+ .din({my_mouse_left, my_xpos, my_ypos}),  
+ .dout({my_mouse_left_buf, my_xpos_buf, my_ypos_buf})
  );
  
  
@@ -78,9 +74,9 @@ clock my_clock
  assign ypos_mux = (mousectl) ? my_ypos_limit : 679 ;
  assign limit_mux = (mousectl) ? my_mouse_left_limit : 0 ;
  
- mouse_limit_player my_mouse_limit_player(
+ mouse_limit_player #(.PLAYER(0'b0)) my_mouse_limit_player(
  .clk(clk65MHz),            
- .rst(rst),                                    
+ .rst(rst_d),                                    
  .xpos(my_xpos_buf),            
  .ypos(my_ypos_buf),            
  .click_mouse(my_mouse_left_buf),                   
@@ -133,7 +129,7 @@ draw_background my_draw_background (
 	.vga_out(vga_bus[0])
   );
 wire [15:0] uart_to_reg, reg_to_uart;
-  wire tx_done;
+wire tx_done;
 wire conv8to16valid, conv16to8ready;
 uart my_uart (
   .clk(clk65MHz),
@@ -150,10 +146,14 @@ uart my_uart (
   wire [3:0] pixel;
   wire [11:0] pixel_addr_ball;
   wire [11:0] ball_xpos, ball_ypos;
-  wire pl1_col;
   wire last_touch,thirdtouched,gnd_col,endgame;
+  wire [7:0] rgb_char,rgb_char2;
+  wire [6:0] char_code,char_code2;
+  wire [3:0] char_line; 
+  wire pl1_col,pl2_col,net_col;
+
   wire [3:0]score_pl1,score_pl2;
-  
+
 uart_demux my_uart_demux(
   .data(uart_to_reg),       
   .clk(clk65MHz),               
@@ -219,8 +219,8 @@ wire [13:0] pixel_addr;
 player1 my_player1(
 	.rst(rst_d),
 	.xpos(xpos_mux),       
-    .ypos(ypos_mux),       
-    .mouse_click(limit_mux),
+  .ypos(ypos_mux),       
+  .mouse_click(limit_mux),
 	.pclk(clk65MHz),
 	.vga_in(vga_bus[0]),
 	.vga_out(vga_bus[1]),
@@ -259,20 +259,16 @@ menu my_menu(
 
 
 player1_rom my_player2_rom (
-    .clk(clk65MHz),
-    .address(pixel_addr2),
-    .rgb(rgb_pixel2)
+  .clk(clk65MHz),
+  .address(pixel_addr2),
+  .rgb(rgb_pixel2)
 );
 
 player1_rom my_player1_rom (
-    .clk(clk65MHz),
-    .address(pixel_addr),
-    .rgb(rgb_pixel)
+  .clk(clk65MHz),
+  .address(pixel_addr),
+  .rgb(rgb_pixel)
 );
-
-
-wire pl2_col,net_col;
-
 
 draw_ball my_draw_ball(
 	.rst(rst_d),

@@ -70,5 +70,16 @@ set_property IOSTANDARD LVCMOS33 [get_ports tx]
 #set_property IOSTANDARD LVCMOS33 [get_ports {test}]
 
 
-
-
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[2]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][14]/D}]
+set_false_path -from [get_pins my_MouseCtl/left_reg/C] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][24]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[10]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][22]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[11]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][23]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[7]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][19]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[6]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][18]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[4]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][16]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[5]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][17]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[0]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][12]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[8]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][20]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[1]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][13]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[9]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][21]/D}]
+set_false_path -from [get_pins {my_MouseCtl/xpos_reg[3]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][15]/D}]

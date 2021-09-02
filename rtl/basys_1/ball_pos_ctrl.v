@@ -17,18 +17,60 @@ module ball_pos_ctrl(
     output wire [11:0] ball_posy_out
   );
 
-  (* mark_debug = "true" *)reg pl1_col_d, pl1_col_d_nxt, pl2_col_d, pl2_col_d_nxt,net_col_d_nxt,net_col_d;
+  reg pl1_col_d, pl1_col_d_nxt, pl2_col_d, pl2_col_d_nxt,net_col_d_nxt,net_col_d;
   wire [11:0] pl1_posx_int,  pl1_posy_int, pl2_posx_int,  pl2_posy_int;
   reg [3:0] ball_state, ball_state_nxt;
-  wire clk100Hz;
+  wire clk100Hz, rst_d;
   wire [18:0] div_count;
-  (* mark_debug = "true" *)reg ovr_touch_d_nxt , ovr_touch_d; 
-  
+  reg ovr_touch_d_nxt , ovr_touch_d; 
+  wire [12:0] vel_x_calc, vel_y_calc;
+  reg signed	[12:-7] vel_x, vel_x_nxt;
+  reg signed 	[12:-7] vel_y, vel_y_nxt;
+  wire wall_col;
+  localparam GND_LVL = 750;
+  localparam 	signed 	PL_CENTER_POSX = 13'd38,
+              PL_CENTER_POSY = 13'd70, //45
+              BALL_CENTER_POS = 13'd32;
+  reg signed	[12:-7] ball_posx, ball_posx_nxt;
+  reg signed 	[12:-7] ball_posy, ball_posy_nxt;
+
+  reg [10:0] ghost_timer, ghost_timer_nxt;
+  reg ghost_time_done;
+  //reg last_touch, last_touch_nxt;
+
+  localparam	PLAYER1 = 1'b0,
+             PLAYER2 = 1'b1;
+
+  localparam	BALL_SIZE = 64;
+
+  localparam	START_POSX_PL1 	= 12'd250,
+             START_POSX_PL2 	= 12'd774,
+             START_POSY 		= 12'd555;
+
+  localparam 	NON_COL = 3'b000,
+              PL1_COL = 3'b001,
+              PL2_COL = 3'b010,
+              WALL_COL= 3'b011,
+              GND_COL = 3'b100,
+              NET_COL = 3'b110;
+
+
+  reg [2:0] last_collision, last_collision_nxt;
+
+  localparam 	HANG = 4'b0000,
+              BOUNCE = 4'b0010,
+              FLIGHT = 4'b0100,
+              WAIT = 4'b1000;
+  reg [7:0] timer, timer_nxt;
+  wire timer_done;
+
+
   clk_divider #(.FREQ(100), .SRC_FREQ(65_000_000)) my_clk_divider(
                 .clk_in(clk),
                 .rst(rst),
                 .clk_div(clk100Hz),
-                .count(div_count)
+                .count(div_count),
+                .rst_d(rst_d)
               );
 
   //extend collision to 1 cycle clk100Hz
@@ -105,24 +147,6 @@ module ball_pos_ctrl(
   end
   //
 
-  localparam GND_LVL = 750;
-
-  reg [7:0] timer, timer_nxt;
-  wire timer_done;
-
-
-
-  //rst delay for clk100Hz
-  reg rst_d, rst_d_nxt;
-  reg [19:0]rstd_timer, rstd_timer_nxt;
-
-  always @*
-  begin
-    if(rst_d)
-      rstd_timer_nxt = rstd_timer + 1;
-    else
-      rstd_timer_nxt = 0;
-  end
 
   delay #(.WIDTH(48), .CLK_DEL(3)) my_delay_inst(
           .din({pl1_posx, pl1_posy, pl2_posx, pl2_posy}),
@@ -131,65 +155,10 @@ module ball_pos_ctrl(
           .rst(rst_d)
         );
 
-  always @(posedge clk)
-  begin
-    if(rst)
-      rstd_timer <= 0;
-    else
-      rstd_timer <= rstd_timer_nxt;
-  end
-
-  always @*
-  begin
-    if(rst)
-      rst_d_nxt = 1;
-    else if(rstd_timer_nxt == 650_000)
-      rst_d_nxt = 0;
-    else
-      rst_d_nxt = rst_d;
-  end
-
-  always @(posedge clk)
-  begin
-    rst_d <= rst_d_nxt;
-  end
-
   //ball position
-
-   reg signed	[12:-7] ball_posx, ball_posx_nxt;
-   reg signed 	[12:-7] ball_posy, ball_posy_nxt;
 
   assign ball_posx_out = ball_posx[11:0];
   assign ball_posy_out = ball_posy[11:0];
-
-
-  localparam 	signed 	PL_CENTER_POSX = 13'd38,
-              PL_CENTER_POSY = 13'd70, //45
-              BALL_CENTER_POS = 13'd32;
-
-  reg signed	[12:-7] vel_x, vel_x_nxt;
-  reg signed 	[12:-7] vel_y, vel_y_nxt;
-
-  //reg last_touch, last_touch_nxt;
-
-  localparam	PLAYER1 = 1'b0,
-             PLAYER2 = 1'b1;
-
-  localparam	BALL_SIZE = 64;
-
-  localparam	START_POSX_PL1 	= 12'd250,
-             START_POSX_PL2 	= 12'd774,
-             START_POSY 		= 12'd555;
-
-
-  localparam 	HANG = 4'b0000,
-              BOUNCE = 4'b0010,
-              FLIGHT = 4'b0100,
-              WAIT = 4'b1000;
-
-  wire wall_col;
-
-  
 
   always @(posedge clk100Hz)
   begin
@@ -235,18 +204,6 @@ module ball_pos_ctrl(
     endcase
   end
 //
-
-  localparam 	NON_COL = 3'b000,
-              PL1_COL = 3'b001,
-              PL2_COL = 3'b010,
-              WALL_COL= 3'b011,
-              GND_COL = 3'b100,
-              NET_COL = 3'b110;
-
-
-  (* mark_debug = "true" *) reg [2:0] last_collision, last_collision_nxt;
-
-
   always @(posedge clk100Hz)
   begin
     if(rst_d)
@@ -271,7 +228,6 @@ module ball_pos_ctrl(
         last_collision_nxt = last_collision;
     endcase
   end
-
 
   //checking collisions with objects
   assign wall_col = ((ball_posx_nxt[12:0] <= 5) || (ball_posx_nxt[12:0] >= 1018 - BALL_SIZE));
@@ -329,7 +285,6 @@ module ball_pos_ctrl(
     end
   end
 
-  (* mark_debug = "true" *)wire [12:0] vel_x_calc, vel_y_calc;
   assign vel_x_calc = (~{1'b0, ((last_collision==PL1_COL) ? pl1_posx_int : pl2_posx_int)} +   ball_posx[12:0]  + (BALL_CENTER_POS + 1 - PL_CENTER_POSX));
   assign vel_y_calc = ( {1'b0, ((last_collision==PL1_COL) ? pl1_posy_int : pl2_posy_int)} + ~(ball_posy[12:0]) + (PL_CENTER_POSY + 1 - BALL_CENTER_POS));
 
@@ -416,8 +371,6 @@ module ball_pos_ctrl(
 
   //Ghost time counter
 
-  reg [10:0] ghost_timer, ghost_timer_nxt;
-  reg ghost_time_done;
 
   always @(posedge clk100Hz)
   begin
@@ -437,7 +390,7 @@ module ball_pos_ctrl(
       end
       FLIGHT:
       begin
-        ghost_time_done = (ghost_timer=='d25);
+        ghost_time_done = (ghost_timer=='d18);
         if(!ghost_time_done)
           ghost_timer_nxt = ghost_timer + 1;
         else
@@ -450,32 +403,5 @@ module ball_pos_ctrl(
       end
     endcase
   end
-
-  //
-
- /* always @(posedge clk100Hz)
-  begin
-    if(rst_d)
-      last_touch <= PLAYER1;
-    else
-      last_touch <= last_touch_nxt;
-  end
-
-  always @*
-  begin
-    case(ball_state)
-      BOUNCE:
-      begin
-        if(pl1_col_d)
-          last_touch_nxt = PLAYER1;
-        else if(pl2_col_d)
-          last_touch_nxt = PLAYER2;
-        else
-          last_touch_nxt = last_touch;
-      end
-      default:
-        last_touch_nxt = last_touch;
-    endcase
-  end*/
 
 endmodule

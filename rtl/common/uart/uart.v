@@ -20,6 +20,8 @@ reg con_broken, con_broken_nxt;
 reg init_con, init_con_nxt;
 reg [9:0] tick_cnt, tick_cnt_nxt;
 wire rx_done;
+wire [7:0] data_rx, data_tx, data_tx_int;
+
 assign rst_int = rst || init_con;
 
 always @(posedge clk)
@@ -82,9 +84,6 @@ my_mod_m_counter(
 	.reset(rst),
 	.max_tick(tick)
 );
-
-wire [7:0] data_rx, data_tx, data_tx_int;
-
 assign data_tx_int = init_con ? 8'hFF : data_tx; 
 
 uart_rx my_uart_rx(

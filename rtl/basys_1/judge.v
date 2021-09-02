@@ -16,7 +16,7 @@ module judge(
  
     );
     
-   wire clk_div;
+   wire clk_div, rst_d;
    reg thirdtouched_nxt;
    //reg sideofball_nxt; //0-player1 , 1 player2
    reg endgame_nxt;
@@ -32,7 +32,8 @@ module judge(
     my_clk_divider (
         .clk_in(clk),
         .clk_div(clk_div),
-        .rst(rst)
+        .rst(rst),
+        .rst_d(rst_d)
     );
     
   
@@ -47,8 +48,8 @@ module judge(
                             ENDGAME = 4'b0100;
                             
     always @(posedge clk ) begin
-        if(rst)begin
-            score_player1<=4'b0000;
+        if(rst_d)begin
+            score_player1<=0;
             score_player2<=0;
             flag_point<=1'b0;
             endgame<=1'b0;

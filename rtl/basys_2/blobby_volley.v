@@ -67,20 +67,16 @@ clock my_clock
   wire [11:0] my_xpos_buf,my_ypos_buf;
   wire my_mouse_left_buf;
  
- buffor_signal_mouse my_buffor_signal_mouse( 
- .pclk(clk65MHz),            
- .rst(rst),             
- .my_left(my_mouse_left),         
- .my_xpos(my_xpos),  
- .my_ypos(my_ypos),  
- .my_left_buf(my_mouse_left_buf),     
- .my_xpos_buf(my_xpos_buf),
- .my_ypos_buf(my_ypos_buf)
- );
+delay #(.WIDTH(25), .CLK_DEL(3)) my_buffor_signal_mouse( 
+  .clk(clk65MHz),            
+  .rst(rst),             
+  .din({my_mouse_left, my_xpos, my_ypos}),  
+  .dout({my_mouse_left_buf, my_xpos_buf, my_ypos_buf})
+);
  
 
 
-mouse_limit_player my_mouse_limit_player(
+mouse_limit_player #(.PLAYER(1))my_mouse_limit_player(
  .clk(clk65MHz),            
  .rst(rst),                                    
  .xpos(my_xpos_buf),            
