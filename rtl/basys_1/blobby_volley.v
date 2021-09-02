@@ -146,13 +146,13 @@ uart my_uart (
   .conv16to8ready(conv16to8ready),
   .conv8to16valid(conv8to16valid)
 );
-  wire [3:0] score_player1,score_player2;
   wire [11:0] ball_posx, ball_posy, pl1_posx, pl1_posy,pl2_posx,pl2_posy;
   wire [3:0] pixel;
   wire [11:0] pixel_addr_ball;
   wire [11:0] ball_xpos, ball_ypos;
   wire pl1_col;
   wire last_touch,thirdtouched,gnd_col,endgame;
+  wire [3:0]score_pl1,score_pl2;
   
 uart_demux my_uart_demux(
   .data(uart_to_reg),       
@@ -172,8 +172,8 @@ uart_mux my_uart_mux(
   .pl1_posy(ypos_mux),
   .ball_posx(ball_xpos),
   .ball_posy(ball_ypos),
-  .pl1_score(score_player1),
-  .pl2_score(score_player2),
+  .pl1_score(score_pl1),
+  .pl2_score(score_pl2),
   .flag_point(last_touch),
   .end_game(endgame),
   .conv16to8ready(conv16to8ready)
@@ -189,7 +189,7 @@ uart_mux my_uart_mux(
       .addr({char_code,char_line}),
       .char_line_pixels(rgb_char)
       );
-   wire [3:0]score_pl1,score_pl2;
+   
    score my_score(
    .rst(rst_d),                           
    .pclk(clk65MHz),                          

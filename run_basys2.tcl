@@ -46,6 +46,7 @@ read_xdc {
 read_vhdl {
 	rtl/common/MouseCtl.vhd
 	rtl/common/Ps2Interface.vhd
+	rtl/common/Mouse_Display.vhd
 }
 read_verilog {
     rtl/basys_2/blobby_volley.v
@@ -72,6 +73,13 @@ read_verilog {
 	rtl/common/draw_ball.v
 	rtl/common/clk_divider.v
     rtl/basys_2/uart_mux.v
+rtl/common/bin2bcd.v
+	rtl/common/font.v
+	rtl/common/score.v
+	rtl/common/menu.v
+	rtl/common/grey_out.v
+	rtl/common/start_writing.v
+	
 }
 
 read_mem {
