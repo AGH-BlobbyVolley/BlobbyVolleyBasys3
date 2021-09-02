@@ -81,14 +81,14 @@ module judge(
             end
            
             POINT: begin  
-                if(score_player1==15 ||score_player2==15)state_nxt = ENDGAME;
-                else state_nxt = START;     
+                state_nxt = START;     
             end  
             ENDGAME: begin  
                 state_nxt=state;   
             end
             START: begin  
-                if( collisionsplayer1 == 1 || collisionsplayer2 == 1) state_nxt = GAMECONT; // player 1 - 0 ; player 2 to 1 
+                if(score_player1==15 ||score_player2==15)state_nxt = ENDGAME;
+                else if( collisionsplayer1 == 1 || collisionsplayer2 == 1) state_nxt = GAMECONT; // player 1 - 0 ; player 2 to 1 
                 else state_nxt = START;          
             end        
             default: state_nxt=state;
@@ -113,8 +113,8 @@ module judge(
             end
             POINT: begin
                 flag_point_nxt =  ( touchedplayer2 == 4 || ( touchedplayer2 != 0 && gnd_col ) || ( touchedplayer1 !=0 && gnd_col && xposball > PLAYINGFIELD2)   ) ? 0 : ( touchedplayer1 == 4 || ( touchedplayer1 != 0 && gnd_col ) || ( touchedplayer2 !=0 && gnd_col && xposball < PLAYINGFIELD1) )? 1 : flag_point ;
-                score_player2_nxt = (( touchedplayer1 == 4 || ( touchedplayer1 != 0 && gnd_col ) || ( touchedplayer2 !=0 && gnd_col && xposball < PLAYINGFIELD1) )&& flag_point == 1) ? score_player2 + 1 : score_player2;
-                score_player1_nxt = (( touchedplayer2 == 4 || ( touchedplayer2 != 0 && gnd_col ) || ( touchedplayer1 !=0 && gnd_col && xposball > PLAYINGFIELD2 ) )&& flag_point == 0) ? score_player1 + 1 : score_player1;
+                score_player2_nxt = (( touchedplayer1 == 4 || ( touchedplayer1 != 0 && gnd_col && xposball < PLAYINGFIELD1 ) || ( touchedplayer2 !=0 && gnd_col && xposball < PLAYINGFIELD1) )&& flag_point == 1) ? score_player2 + 1 : score_player2;
+                score_player1_nxt = (( touchedplayer2 == 4 || ( touchedplayer2 != 0 && gnd_col &&  xposball > PLAYINGFIELD2) || ( touchedplayer1 !=0 && gnd_col && xposball > PLAYINGFIELD2 ) )&& flag_point == 0) ? score_player1 + 1 : score_player1;
             end
             START:begin
                 
