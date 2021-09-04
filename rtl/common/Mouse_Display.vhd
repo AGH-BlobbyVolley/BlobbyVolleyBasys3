@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------
 -- mouse_displayer.vhd
 ------------------------------------------------------------------------
--- Author : Ulrich Zoltán
+-- Author : Ulrich Zoltï¿½n
 --          Copyright 2006 Digilent, Inc.
 ------------------------------------------------------------------------
 -- Software version : Xilinx ISE 7.1.04i
@@ -102,8 +102,8 @@ port (
    xpos     : in std_logic_vector(11 downto 0);
    ypos     : in std_logic_vector(11 downto 0);
 
-   hcount_in   : in std_logic_vector(10 downto 0);
-   vcount_in   : in std_logic_vector(10 downto 0);
+   hcount_in   : in std_logic_vector(11 downto 0);
+   vcount_in   : in std_logic_vector(11 downto 0);
    
    vblnk_in    : in std_logic; -- if VGA blank is used
    hblnk_in    : in std_logic; -- if VGA blank is used
@@ -114,8 +114,8 @@ port (
    
    enable_mouse_display_out : out std_logic;
 
-   hcount_out   : out std_logic_vector(10 downto 0);
-   vcount_out   : out std_logic_vector(10 downto 0);
+   hcount_out   : out std_logic_vector(11 downto 0);
+   vcount_out   : out std_logic_vector(11 downto 0);
 
    red_out  : out std_logic_vector(3 downto 0);
    green_out: out std_logic_vector(3 downto 0);
@@ -227,7 +227,7 @@ begin
    end process x_diff;
 
    -- compute ydiff
-   y_diff: process(vcount_in, xpos)
+   y_diff: process(vcount_in, xpos, ypos)
    variable temp_diff: std_logic_vector(11 downto 0) := (others => '0');
    begin
          temp_diff := vcount_in - ypos;
