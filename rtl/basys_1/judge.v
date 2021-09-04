@@ -15,7 +15,8 @@ module judge(
 
  
     );
-    
+   
+   reg [8:0] timer, timer_nxt; 
    wire clk_div, rst_d;
    reg thirdtouched_nxt;
    //reg sideofball_nxt; //0-player1 , 1 player2
@@ -24,7 +25,7 @@ module judge(
    reg [3:0] score_player1_nxt,score_player2_nxt;
    reg [3:0] state,state_nxt; 
    reg [2:0] touchedplayer1 , touchedplayer1_nxt , touchedplayer2,touchedplayer2_nxt;
-   
+   wire timer_done;
    reg [24:0] counter, counter_nxt;
    //100hz
    clk_divider 
@@ -43,13 +44,14 @@ module judge(
                         GROUND_POSITION=750;
                     
     localparam   START = 4'b1000,
+                    WAIT = 4'b1100,
                     POINT = 4'b0001,
                         GAMECONT = 4'b0010,
                             ENDGAME = 4'b0100;
                             
     always @(posedge clk ) begin
         if(rst_d)begin
-            score_player1<=4'b1110;
+            score_player1<=4'b0000;
             score_player2<=0;
             flag_point<=1'b0;
             endgame<=1'b0;
@@ -80,9 +82,14 @@ module judge(
                 if (gnd_col || touchedplayer1 == 4 || touchedplayer2 == 4 ) state_nxt = POINT;
                 else state_nxt = GAMECONT;
             end
-           
+            WAIT:begin
+                if(timer_done)  
+                    state_nxt = START;
+                else 
+                    state_nxt = WAIT;
+            end
             POINT: begin  
-                state_nxt = START;     
+                state_nxt = WAIT;     
             end  
             ENDGAME: begin  
                 state_nxt=state;   
@@ -95,6 +102,32 @@ module judge(
             default: state_nxt=state;
         endcase
     end 
+    
+    assign timer_done = (timer==9'd300);
+    
+    
+      always @(posedge clk_div)
+    begin
+      if(rst_d)
+        timer <= 0;
+      else
+        timer <= timer_nxt;
+    end
+  
+    always @*
+    begin
+      case(state)
+        WAIT:
+        begin
+          timer_nxt = timer + 1;
+        end
+        default:
+        begin
+          timer_nxt = 0;
+        end
+      endcase
+    end
+    
     
     always @* begin
         touchedplayer1_nxt = touchedplayer1;     
@@ -113,9 +146,9 @@ module judge(
                 thirdtouched_nxt = ( touchedplayer2 > 3 || touchedplayer1 > 3 )? 1 : 0;
             end
             POINT: begin
-                flag_point_nxt =  ( touchedplayer2 == 4 || ( touchedplayer2 != 0 && gnd_col &&  xposball > PLAYINGFIELD2 ) || ( touchedplayer1 !=0 && gnd_col && xposball > PLAYINGFIELD2)   ) ? 0 : ( touchedplayer1 == 4 || ( touchedplayer1 != 0 && gnd_col && xposball < PLAYINGFIELD1 ) || ( touchedplayer2 !=0 && gnd_col && xposball < PLAYINGFIELD1) )? 1 : flag_point ;
-                score_player2_nxt = (( touchedplayer1 == 4 || ( touchedplayer1 != 0 && gnd_col && xposball < PLAYINGFIELD1 ) || ( touchedplayer2 !=0 && gnd_col && xposball < PLAYINGFIELD1) )&& flag_point == 1) ? score_player2 + 1 : score_player2;
-                score_player1_nxt = (( touchedplayer2 == 4 || ( touchedplayer2 != 0 && gnd_col &&  xposball > PLAYINGFIELD2) || ( touchedplayer1 !=0 && gnd_col && xposball > PLAYINGFIELD2 ) )&& flag_point == 0) ? score_player1 + 1 : score_player1;
+                flag_point_nxt =  ( touchedplayer2 == 4 || ( touchedplayer2 != 0 && gnd_col &&  xposball > PLAYINGFIELD2 ) || ( touchedplayer1 !=0 && gnd_col && xposball > PLAYINGFIELD2)   ) ? 0 : ( touchedplayer1 == 4 || ( touchedplayer1 != 0 && gnd_col && xposball < PLAYINGFIELD1 ) || ( touchedplayer2 !=0 && gnd_col && xposball < PLAYINGFIELD1) )? 1 : flag_point ; 
+                score_player2_nxt = (( touchedplayer1 == 4 || ( gnd_col && xposball < PLAYINGFIELD1) )&& flag_point == 1) ? score_player2 + 1 : score_player2;
+                score_player1_nxt = (( touchedplayer2 == 4 ||  ( gnd_col && xposball > PLAYINGFIELD2 ) )&& flag_point == 0) ? score_player1 + 1 : score_player1;
             end
             START:begin
                 
