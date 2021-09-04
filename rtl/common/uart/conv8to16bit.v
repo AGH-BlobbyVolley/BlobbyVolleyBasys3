@@ -36,7 +36,7 @@ module conv8to16bit (
     if(data_tick)
       case(din[7:6])
         2'b00: begin
-          dout_nxt = 16'b0;
+          dout_nxt = 16'hFFFF;
           valid_nxt = 1'b0;
         end
         2'b01: begin

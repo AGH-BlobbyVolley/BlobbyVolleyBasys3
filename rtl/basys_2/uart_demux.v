@@ -14,7 +14,6 @@ module uart_demux (
     output reg [3:0] pl2_score,
     output reg flag_point,
     output reg end_game,
-    output reg reset,
     input wire conv8to16valid
   );
 
@@ -42,7 +41,6 @@ module uart_demux (
       pl2_score <= 4'b0;
       flag_point <= 1'b0;
       end_game <= 1'b0;
-      reset <= 1'b0;
     end
     else
     begin
@@ -54,7 +52,6 @@ module uart_demux (
       pl2_score <= pl2_score_nxt;
       flag_point <= flag_point_nxt;
       end_game <= end_game_nxt;
-      reset <= reset_nxt;
     end
 
   end
@@ -69,7 +66,6 @@ module uart_demux (
     pl2_score_nxt = pl2_score;
     flag_point_nxt = flag_point;
     end_game_nxt = end_game;
-    reset_nxt = reset;
     if(conv8to16valid)
       case(data[15:12])
         PL1_POSX:
@@ -86,7 +82,6 @@ module uart_demux (
           pl2_score_nxt = data[7:4];
           flag_point_nxt = data[8];
           end_game_nxt = data[9];
-          reset_nxt = data[10];
         end
       endcase
   end

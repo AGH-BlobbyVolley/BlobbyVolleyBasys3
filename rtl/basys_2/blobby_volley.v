@@ -17,7 +17,7 @@ module blobby_volley(
   output wire tx
   );
 wire clk100MHz;
-wire reset,reset_demux;
+wire reset,reset_delay;
 wire clk65MHz;
 wire locked;
 wire rst_d;
@@ -27,11 +27,13 @@ clock my_clock
   .clk100MHz(clk100MHz),
   .clk65MHz(clk65MHz),
   // Status and control signals
-  .reset(rst||reset||reset_demux),
+  .reset(rst),
   .locked(locked),
  // Clock in ports
   .clk(clk)
  );
+ assign rst_d = (reset||reset_delay)? 1 : 0;
+
  wire [11:0] my_xpos_limit,my_ypos_limit;
  wire my_mouse_left_limit;
  wire [11:0] my_xpos,my_ypos;
@@ -92,7 +94,7 @@ reset my_reset
 (
 	.rst(locked),
 	.pclk(clk65MHz),
-	.delay_rst(rst_d)
+	.delay_rst(reset_delay)
 );
 ODDR pclk_oddr (
   .Q(pclk_mirror),
@@ -160,7 +162,6 @@ uart_demux my_uart_demux(
     .pl2_score(score_pl2),
     .flag_point(last_touch),
     .end_game(endgame),
-    .reset(reset_demux),
     .conv8to16valid(conv8to16valid)
   );
 
