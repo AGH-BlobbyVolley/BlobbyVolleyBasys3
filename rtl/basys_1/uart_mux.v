@@ -18,7 +18,7 @@ module uart_mux (
               PL1_POSY = 4'h4,
               BALL_POSX = 4'h5,
               BALL_POSY = 4'h6,
-              MATCH_CTRL = 4'h7;
+              MATCH_CTRL = 4'h0;
 
   reg [3:0] sel, sel_nxt;
 

@@ -14,6 +14,7 @@ module uart_demux (
     output reg [3:0] pl2_score,
     output reg flag_point,
     output reg end_game,
+    output reg reset,
     input wire conv8to16valid
   );
 
@@ -21,13 +22,13 @@ module uart_demux (
               PL1_POSY = 4'h4,
               BALL_POSX = 4'h5,
               BALL_POSY = 4'h6,
-              MATCH_CTRL = 4'h7;
+              MATCH_CTRL = 4'h0;
 
 
 
   reg [11:0] pl1_posx_nxt, pl1_posy_nxt, ball_posx_nxt, ball_posy_nxt;
   reg [3:0] pl1_score_nxt, pl2_score_nxt;
-  reg flag_point_nxt, end_game_nxt;
+  reg flag_point_nxt, end_game_nxt,reset_nxt;
 
   always @(posedge clk)
   begin
@@ -37,8 +38,11 @@ module uart_demux (
       pl1_posy <= 12'b0;
       ball_posx <= 12'b0;
       ball_posy <= 12'b0;
-      pl1_score <= 12'b0;
-      pl2_score <= 12'b0;
+      pl1_score <= 4'b0;
+      pl2_score <= 4'b0;
+      flag_point <= 1'b0;
+      end_game <= 1'b0;
+      reset <= 1'b0;
     end
     else
     begin
@@ -48,8 +52,9 @@ module uart_demux (
       ball_posy <= ball_posy_nxt;
       pl1_score <= pl1_score_nxt;
       pl2_score <= pl2_score_nxt;
-      flag_point = flag_point_nxt;
-      end_game = end_game_nxt;
+      flag_point <= flag_point_nxt;
+      end_game <= end_game_nxt;
+      reset <= reset_nxt;
     end
 
   end
@@ -64,6 +69,7 @@ module uart_demux (
     pl2_score_nxt = pl2_score;
     flag_point_nxt = flag_point;
     end_game_nxt = end_game;
+    reset_nxt = reset;
     if(conv8to16valid)
       case(data[15:12])
         PL1_POSX:
@@ -80,6 +86,7 @@ module uart_demux (
           pl2_score_nxt = data[7:4];
           flag_point_nxt = data[8];
           end_game_nxt = data[9];
+          reset_nxt = data[10];
         end
       endcase
   end

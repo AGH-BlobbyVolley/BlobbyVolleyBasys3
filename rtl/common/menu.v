@@ -14,6 +14,7 @@ module menu(
         input wire flag_point,
         input  wire [`VGA_BUS_SIZE-1:0] vga_in_menu,   
         output wire [`VGA_BUS_SIZE-1:0] vga_out,
+        output reg reset,
         output reg  mousecontrol,
         output  reg enable_menu
 );
@@ -21,7 +22,7 @@ module menu(
 wire [7:0] char_xy,rgb_char;
 wire [6:0] char_code;
 wire [3:0] char_line;
-reg mousecontrol_nxt,enable_menu_nxt;
+reg mousecontrol_nxt,enable_menu_nxt,reset_nxt;
   
   localparam 	WIDTH = 390,
               POSY = 330,
@@ -90,10 +91,12 @@ always @(posedge clk) begin
     if(rst)begin
         mousecontrol<=0;
         enable_menu<=1;
+        reset<=0;
     end
     else begin
         mousecontrol<= mousecontrol_nxt;
         enable_menu <= enable_menu_nxt;
+        reset<=reset_nxt;
     end
 
 end
@@ -102,16 +105,16 @@ end
 always @* begin  
     if((xpos>=POSX && xpos<=POSX+WIDTH) && (ypos>=POSY && ypos<=POSY+HEIGHT)&&left) begin 
         mousecontrol_nxt = 1;
-        enable_menu_nxt = 0;
+        enable_menu_nxt = 0;    
+        reset_nxt = (endgame)? 1 :0;
     end 
-    else if(endgame)begin
-        mousecontrol_nxt = 0;
-        enable_menu_nxt = 1;                
-       end
     else begin
-        mousecontrol_nxt = mousecontrol ;
-        enable_menu_nxt = enable_menu;                
-    end
+        mousecontrol_nxt = (endgame)?0 : mousecontrol;
+        enable_menu_nxt = (endgame)?1 : enable_menu; 
+        reset_nxt = reset;
+    end                
+
+
 end
 
 assign vga_out=vga_bus[1];

@@ -19,7 +19,7 @@ module blobby_volley(
 wire clk100MHz;
 wire clk65MHz;
 wire locked;
-wire rst_d;
+wire rst_d,reset,reset_delay;
 clock my_clock
  (
   // Clock out ports
@@ -33,7 +33,7 @@ clock my_clock
  );
  wire [11:0] my_xpos,my_ypos;
  wire my_mouse_left;
-  
+ assign rst_d = (reset||reset_delay)? 1 : 0;
  MouseCtl my_MouseCtl
   (
   .clk(clk100MHz),        
@@ -89,7 +89,7 @@ reset my_reset
 (
 	.rst(locked),
 	.pclk(clk65MHz),
-	.delay_rst(rst_d)
+	.delay_rst(reset_delay)
 );
   ODDR pclk_oddr (
     .Q(pclk_mirror),
@@ -249,7 +249,8 @@ menu my_menu(
     .xpos(my_xpos_buf),                           
     .ypos(my_ypos_buf),                           
     .enable_menu(enable_menu), 
-    .endgame(endgame), 
+    .endgame(endgame),
+    .reset(reset), 
     .flag_point(last_touch),                  
     .enable_game(),                    
     .vga_in_menu(vga_bus[2]),     

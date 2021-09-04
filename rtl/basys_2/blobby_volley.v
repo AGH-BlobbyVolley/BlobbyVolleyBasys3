@@ -17,6 +17,7 @@ module blobby_volley(
   output wire tx
   );
 wire clk100MHz;
+wire reset,reset_demux;
 wire clk65MHz;
 wire locked;
 wire rst_d;
@@ -26,7 +27,7 @@ clock my_clock
   .clk100MHz(clk100MHz),
   .clk65MHz(clk65MHz),
   // Status and control signals
-  .reset(rst),
+  .reset(rst||reset||reset_demux),
   .locked(locked),
  // Clock in ports
   .clk(clk)
@@ -159,6 +160,7 @@ uart_demux my_uart_demux(
     .pl2_score(score_pl2),
     .flag_point(last_touch),
     .end_game(endgame),
+    .reset(reset_demux),
     .conv8to16valid(conv8to16valid)
   );
 
@@ -253,7 +255,8 @@ menu my_menu(
     .ypos(my_ypos_buf),                           
     .enable_menu(enable_menu),
     .endgame(endgame), 
-    .flag_point(last_touch),                     
+    .flag_point(last_touch),
+    .reset(reset),                 
     .enable_game(),                    
     .vga_in_menu(vga_bus[2]),     
     .vga_out(vga_bus[5]),    

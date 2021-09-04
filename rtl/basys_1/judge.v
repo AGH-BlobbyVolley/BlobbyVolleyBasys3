@@ -49,7 +49,7 @@ module judge(
                             
     always @(posedge clk ) begin
         if(rst_d)begin
-            score_player1<=0;
+            score_player1<=4'b1110;
             score_player2<=0;
             flag_point<=1'b0;
             endgame<=1'b0;
@@ -113,7 +113,7 @@ module judge(
                 thirdtouched_nxt = ( touchedplayer2 > 3 || touchedplayer1 > 3 )? 1 : 0;
             end
             POINT: begin
-                flag_point_nxt =  ( touchedplayer2 == 4 || ( touchedplayer2 != 0 && gnd_col ) || ( touchedplayer1 !=0 && gnd_col && xposball > PLAYINGFIELD2)   ) ? 0 : ( touchedplayer1 == 4 || ( touchedplayer1 != 0 && gnd_col ) || ( touchedplayer2 !=0 && gnd_col && xposball < PLAYINGFIELD1) )? 1 : flag_point ;
+                flag_point_nxt =  ( touchedplayer2 == 4 || ( touchedplayer2 != 0 && gnd_col &&  xposball > PLAYINGFIELD2 ) || ( touchedplayer1 !=0 && gnd_col && xposball > PLAYINGFIELD2)   ) ? 0 : ( touchedplayer1 == 4 || ( touchedplayer1 != 0 && gnd_col && xposball < PLAYINGFIELD1 ) || ( touchedplayer2 !=0 && gnd_col && xposball < PLAYINGFIELD1) )? 1 : flag_point ;
                 score_player2_nxt = (( touchedplayer1 == 4 || ( touchedplayer1 != 0 && gnd_col && xposball < PLAYINGFIELD1 ) || ( touchedplayer2 !=0 && gnd_col && xposball < PLAYINGFIELD1) )&& flag_point == 1) ? score_player2 + 1 : score_player2;
                 score_player1_nxt = (( touchedplayer2 == 4 || ( touchedplayer2 != 0 && gnd_col &&  xposball > PLAYINGFIELD2) || ( touchedplayer1 !=0 && gnd_col && xposball > PLAYINGFIELD2 ) )&& flag_point == 0) ? score_player1 + 1 : score_player1;
             end
