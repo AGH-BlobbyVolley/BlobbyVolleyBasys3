@@ -64,7 +64,7 @@ module uart_mux (
       BALL_POSY:
         data_nxt = {sel,ball_posy};
       MATCH_CTRL:
-        data_nxt = {sel,end_game,flag_point,pl2_score,pl1_score};
+        data_nxt = {sel,2'b00,end_game,flag_point,pl2_score,pl1_score};
       default:
         data_nxt = {sel, 12'b0};
     endcase

@@ -30,12 +30,14 @@ module mouse_limit_player
      input wire  click_mouse,
 
 
-     output reg [11:0] xpos_limit,
+     output reg signed [11:0] xpos_limit,
      output reg [11:0] ypos_limit,
      output reg click_mouse_limit
    );
   localparam MAX_X_PLAYER= PLAYER ? 950: 430;
   localparam MIN_X_PLAYER= PLAYER ? 525 : 0;
+  localparam MIN_X_PLAYER_MOD =  PLAYER ? MIN_X_PLAYER : 12'h8;
+  localparam  PLAYER_XPOS_INIT = PLAYER ? 750 : 250;
   localparam GROUND_POSITION=679;
   localparam JUMP_POSITION=450;
 
@@ -46,7 +48,8 @@ module mouse_limit_player
   localparam FALLDOWN =3'b110;
   localparam DOWN =3'b111;
   wire clk_div, rst_d;
-  reg [11:0] xpos_nxt;
+  wire [11:0] xpos_int;
+  reg signed [11:0] xpos_nxt;
   clk_divider
     #(.FREQ(100), .SRC_FREQ(65_000_000))
     my_clk_divider (
@@ -59,7 +62,7 @@ module mouse_limit_player
   always @(posedge clk_div)
   begin
     if(rst_d)
-      xpos_limit <= 0;
+      xpos_limit <= PLAYER_XPOS_INIT;
     else
       xpos_limit <= xpos_nxt;
   end
@@ -86,15 +89,15 @@ module mouse_limit_player
     end
   end
 
+  assign xpos_int = xpos>12'hF ? xpos : 12'h9;
+
   always @*
   begin
-    if(xpos<MAX_X_PLAYER && xpos>MIN_X_PLAYER)
-      xpos_nxt = xpos;
-    else if(xpos>=MAX_X_PLAYER)
-      xpos_nxt = MAX_X_PLAYER;
-    else
-      xpos_nxt = MIN_X_PLAYER;
+    if((xpos_int<xpos_limit+$signed(12'hFFA)) && ((xpos_limit + $signed(12'h8)) >= $signed(MIN_X_PLAYER_MOD))) xpos_nxt =  xpos_limit + (state==MOVE ? 12'hFFC: 12'hFFE);
+    else if((xpos_limit < xpos_int + $signed(12'hFFA)) && ((xpos_limit + $signed(12'h8)) < MAX_X_PLAYER)) xpos_nxt = xpos_limit + (state==MOVE ? 12'h6 : 12'h2);
+    else xpos_nxt = xpos_limit;
   end
+
   //! fsm_extract
   always @*
   begin

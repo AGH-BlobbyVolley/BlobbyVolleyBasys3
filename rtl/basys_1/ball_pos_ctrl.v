@@ -110,7 +110,7 @@ module ball_pos_ctrl(
   begin
     if(pl1_col)
       pl1_col_d_nxt = 1;
-    else if(ball_state==BOUNCE)
+    else if(ball_state==BOUNCE || ball_state==WAIT)
       pl1_col_d_nxt = 0;
     else
       pl1_col_d_nxt = (div_count==16'hFFFF && ~clk100Hz) ? 0 : pl1_col_d;
@@ -120,7 +120,7 @@ module ball_pos_ctrl(
   begin
     if(net_col)
       net_col_d_nxt = 1;
-    else if(ball_state==BOUNCE)
+    else if(ball_state==BOUNCE || ball_state==WAIT)
       net_col_d_nxt = 0;
     else
       net_col_d_nxt = (div_count==16'hFFFF && ~clk100Hz) ? 0 : net_col_d;
@@ -130,7 +130,7 @@ module ball_pos_ctrl(
   begin
     if(pl2_col)
       pl2_col_d_nxt = 1;
-    else if(ball_state==BOUNCE)
+    else if(ball_state==BOUNCE || ball_state==WAIT)
       pl2_col_d_nxt = 0;
     else
       pl2_col_d_nxt = (div_count==16'hFFFF && ~clk100Hz) ? 0 : pl2_col_d;
@@ -140,7 +140,7 @@ module ball_pos_ctrl(
   begin
     if(ovr_touch)
       ovr_touch_d_nxt = 1;
-    else if(ball_state==BOUNCE)
+    else if(ball_state==BOUNCE || ball_state==WAIT)
       ovr_touch_d_nxt = 0;
     else
       ovr_touch_d_nxt = (div_count==19'hFFFFF && ~clk100Hz) ? 0 : ovr_touch_d;
@@ -174,7 +174,7 @@ module ball_pos_ctrl(
     case(ball_state)
       HANG:
       begin
-        if(pl1_col_d || pl2_col_d)
+        if((pl1_col_d || pl2_col_d) && ghost_time_done)
           ball_state_nxt=BOUNCE;
         else
           ball_state_nxt=HANG;
@@ -183,12 +183,12 @@ module ball_pos_ctrl(
           ball_state_nxt=FLIGHT;
       FLIGHT:
       begin
-        if((pl1_col_d || pl2_col_d) && ghost_time_done)
+        if(gnd_col || ovr_touch_d)
+          ball_state_nxt=WAIT;
+        else if((pl1_col_d || pl2_col_d) && ghost_time_done)
           ball_state_nxt=BOUNCE;
         else if(wall_col || (net_col_d && ghost_time_done) )
           ball_state_nxt=BOUNCE;
-        else if(gnd_col || ovr_touch_d)
-          ball_state_nxt=WAIT;
         else
           ball_state_nxt=FLIGHT;
       end
@@ -224,6 +224,10 @@ module ball_pos_ctrl(
             wall_col  ? WALL_COL :
                 net_col_d ?  NET_COL :
                     GND_COL ? GND_COL : NON_COL;
+      BOUNCE:
+        last_collision_nxt = NON_COL;
+      WAIT:
+        last_collision_nxt = NON_COL;
       default:
         last_collision_nxt = last_collision;
     endcase
@@ -311,7 +315,7 @@ module ball_pos_ctrl(
           end
           NET_COL:
           begin
-          if( ball_posy <= $signed(430) )begin
+          if( ball_posy <= $signed(450) )begin
                 vel_x_nxt = vel_x;
                 vel_y_nxt = ~vel_y+1;
           end
@@ -388,9 +392,9 @@ module ball_pos_ctrl(
         ghost_time_done = 0;
         ghost_timer_nxt = 0;
       end
-      FLIGHT:
+      FLIGHT, HANG:
       begin
-        ghost_time_done = (ghost_timer=='d18);
+        ghost_time_done = (ghost_timer=='d5);
         if(!ghost_time_done)
           ghost_timer_nxt = ghost_timer + 1;
         else
