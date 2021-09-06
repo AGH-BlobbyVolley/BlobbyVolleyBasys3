@@ -162,7 +162,7 @@ uart_demux my_uart_demux(
   .pl2_posy(pl2_posy),
   .conv8to16valid(conv8to16valid)
 );
-  
+  wire whistle;
 uart_mux my_uart_mux(
   .data(reg_to_uart),
   .clk(clk65MHz),
