@@ -20,14 +20,14 @@ wire clk100MHz;
 wire reset,reset_demux;
 wire clk65MHz;
 wire locked;
-wire rst_d;
+wire rst_d, reset_delay;
 clock my_clock
  (
   // Clock out ports
   .clk100MHz(clk100MHz),
   .clk65MHz(clk65MHz),
   // Status and control signals
-  .reset(rst||reset||reset_demux),
+  .reset(rst),
   .locked(locked),
  // Clock in ports
   .clk(clk)
@@ -40,10 +40,12 @@ clock my_clock
  wire limit_mux;
  wire [3:0] bcd01,bcd02,bcd11,bcd12;
  wire mousectl; 
+
  assign xpos_mux = (mousectl) ? my_xpos_limit : 50 ;   
  assign ypos_mux = (mousectl) ? my_ypos_limit : 679 ;
  assign limit_mux = (mousectl) ? my_mouse_left_limit : 0 ;
 
+ assign rst_d = (reset||reset_delay)? 1 : 0;
 
  MouseCtl my_MouseCtl
   (
@@ -92,7 +94,7 @@ reset my_reset
 (
 	.rst(locked),
 	.pclk(clk65MHz),
-	.delay_rst(rst_d)
+	.delay_rst(reset_delay)
 );
 ODDR pclk_oddr (
   .Q(pclk_mirror),
