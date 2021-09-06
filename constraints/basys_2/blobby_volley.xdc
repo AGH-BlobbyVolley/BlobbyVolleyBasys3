@@ -66,6 +66,14 @@ set_property IOSTANDARD LVCMOS33 [get_ports rx]
 set_property PACKAGE_PIN G2 [get_ports tx]
 set_property IOSTANDARD LVCMOS33 [get_ports tx]
 
+#audio_out
+set_property PACKAGE_PIN K17 [get_ports a_out]
+set_property IOSTANDARD LVCMOS33 [get_ports a_out]
+set_property PACKAGE_PIN M18 [get_ports gain]
+set_property IOSTANDARD LVCMOS33 [get_ports gain]
+set_property PACKAGE_PIN P18 [get_ports shut_down_n]
+set_property IOSTANDARD LVCMOS33 [get_ports shut_down_n]
+
 #set_property PACKAGE_PIN T17 [get_ports {test}]
 #set_property IOSTANDARD LVCMOS33 [get_ports {test}]
 

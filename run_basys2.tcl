@@ -73,13 +73,17 @@ read_verilog {
 	rtl/common/draw_ball.v
 	rtl/common/clk_divider.v
     rtl/basys_2/uart_mux.v
-rtl/common/bin2bcd.v
+    rtl/common/bin2bcd.v
 	rtl/common/font.v
 	rtl/common/score.v
 	rtl/common/menu.v
 	rtl/common/grey_out.v
 	rtl/common/start_writing.v
-	
+    rtl/basys_2/whistle/whistle.v
+    rtl/basys_2/whistle/sine_gen.v
+    rtl/basys_2/whistle/pwm.v
+    rtl/basys_2/whistle/mix.v
+    rtl/basys_2/whistle/vol_reg.v
 }
 
 read_mem {

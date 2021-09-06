@@ -14,6 +14,7 @@ module uart_demux (
     output reg [3:0] pl2_score,
     output reg flag_point,
     output reg end_game,
+    output reg whistle_play,
     input wire conv8to16valid
   );
 
@@ -28,6 +29,7 @@ module uart_demux (
   reg [11:0] pl1_posx_nxt, pl1_posy_nxt, ball_posx_nxt, ball_posy_nxt;
   reg [3:0] pl1_score_nxt, pl2_score_nxt;
   reg flag_point_nxt, end_game_nxt,reset_nxt;
+  reg whistle_play_nxt;
 
   always @(posedge clk)
   begin
@@ -41,6 +43,7 @@ module uart_demux (
       pl2_score <= 4'b0;
       flag_point <= 1'b0;
       end_game <= 1'b0;
+      whistle_play <= 1'b0;
     end
     else
     begin
@@ -52,12 +55,14 @@ module uart_demux (
       pl2_score <= pl2_score_nxt;
       flag_point <= flag_point_nxt;
       end_game <= end_game_nxt;
+      whistle_play <= whistle_play_nxt;
     end
 
   end
 
   always @*
   begin
+    whistle_play_nxt = whistle_play;
     pl1_posx_nxt = pl1_posx;
     pl1_posy_nxt = pl1_posy;
     ball_posx_nxt = ball_posx;
@@ -82,6 +87,7 @@ module uart_demux (
           pl2_score_nxt = data[7:4];
           flag_point_nxt = data[8];
           end_game_nxt = data[9];
+          whistle_play_nxt = data[10];
         end
       endcase
   end
