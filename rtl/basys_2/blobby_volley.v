@@ -14,7 +14,10 @@ module blobby_volley(
   output wire [3:0] g,
   output wire [3:0] b,
   output wire pclk_mirror,
-  output wire tx
+  output wire tx,
+  output wire gain,
+  output wire shut_down_n,
+  output wire a_out
   );
 wire clk100MHz;
 wire reset,reset_demux;
@@ -39,7 +42,8 @@ clock my_clock
  wire [11:0] xpos_mux,ypos_mux;
  wire limit_mux;
  wire [3:0] bcd01,bcd02,bcd11,bcd12;
- wire mousectl; 
+ wire mousectl;
+ wire whistle_play;
 
  assign xpos_mux = (mousectl) ? my_xpos_limit : 50 ;   
  assign ypos_mux = (mousectl) ? my_ypos_limit : 679 ;
@@ -59,8 +63,8 @@ clock my_clock
   .right(),      
   .new_event(),  
   .value(0),      
-  .setx(),       
-  .sety(),       
+  .setx(1'b0),       
+  .sety(1'b0),       
   .setmax_x(0),   
   .setmax_y(0),   
   .ps2_clk(ps2_clk),
@@ -162,7 +166,7 @@ uart_demux my_uart_demux(
     .pl2_score(score_pl2),
     .flag_point(last_touch),
     .end_game(endgame),
-    .reset(reset_demux),
+    .whistle_play(whistle_play),
     .conv8to16valid(conv8to16valid)
   );
 
@@ -295,6 +299,15 @@ ball_rom my_ball_rom (
     .clk(clk65MHz),
     .address(pixel_addr_ball),
     .pixel(pixel)
+);
+
+whistle my_whistle(
+  .rst(rst_d),
+  .clk(clk100MHz),
+  .start(whistle_play),
+  .gain(gain),
+  .shut_down_n(shut_down_n),
+  .a_out(a_out)
 );
 
 assign vs = (enable_menu)? vga_bus[5][`VGA_VS_BITS] : vga_bus[4][`VGA_VS_BITS];
