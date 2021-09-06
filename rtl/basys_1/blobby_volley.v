@@ -46,8 +46,8 @@ clock my_clock
   .right(),      
   .new_event(),  
   .value(0),      
-  .setx(),       
-  .sety(),       
+  .setx(1'b0),       
+  .sety(1'b0),       
   .setmax_x(0),   
   .setmax_y(0),   
   .ps2_clk(ps2_clk),
@@ -74,7 +74,7 @@ clock my_clock
  assign ypos_mux = (mousectl) ? my_ypos_limit : 679 ;
  assign limit_mux = (mousectl) ? my_mouse_left_limit : 0 ;
  
- mouse_limit_player #(.PLAYER(0'b0)) my_mouse_limit_player(
+ mouse_limit_player #(.PLAYER(1'b0)) my_mouse_limit_player(
  .clk(clk65MHz),            
  .rst(rst_d),                                    
  .xpos(my_xpos_buf),            
@@ -176,12 +176,10 @@ uart_mux my_uart_mux(
   .pl2_score(score_pl2),
   .flag_point(last_touch),
   .end_game(endgame),
+  .whistle(whistle),
   .conv16to8ready(conv16to8ready)
 );
 
-  wire [7:0] rgb_char,rgb_char2;
-  wire [6:0] char_code,char_code2;
-  wire [3:0] char_line;
 
     font_rom my_font_rom(
       .clk(clk65MHz),
@@ -332,7 +330,8 @@ judge my_judge(
 	.score_player2(score_pl2),
 	.flag_point(last_touch),
 	.endgame(endgame),
-	.thirdtouched(thirdtouched)
+	.thirdtouched(thirdtouched),
+	.whistle(whistle)
 );
 
 assign vs = (enable_menu)? vga_bus[5][`VGA_VS_BITS] : vga_bus[4][`VGA_VS_BITS];

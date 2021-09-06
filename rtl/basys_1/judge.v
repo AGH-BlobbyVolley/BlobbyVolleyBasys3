@@ -11,11 +11,12 @@ module judge(
         output reg [3:0] score_player2,
         output reg thirdtouched,
         output reg flag_point,
+        output reg whistle,
         output reg endgame
 
  
     );
-   
+   reg whistle_nxt;
    reg [8:0] timer, timer_nxt; 
    wire clk_div, rst_d;
    reg thirdtouched_nxt;
@@ -108,12 +109,16 @@ module judge(
     
     
       always @(posedge clk_div)
-    begin
-      if(rst_d)
-        timer <= 0;
-      else
-        timer <= timer_nxt;
+  begin
+    if(rst_d)begin
+      timer <= 0;
+      whistle<=0;
     end
+    else begin 
+      timer <= timer_nxt;
+      whistle<=whistle_nxt;
+    end
+  end
   
     always @*
     begin
@@ -139,6 +144,7 @@ module judge(
         endgame_nxt =  endgame; 
         thirdtouched_nxt=thirdtouched; 
         counter_nxt = counter ;
+        whistle_nxt = 0;
          case(state)
             GAMECONT : begin  //licznik kolizji
                 counter_nxt = ( counter == 24'hF7F490 ) ? 0 : ( (counter == 0 && (collisionsplayer1 || collisionsplayer2)) || counter != 0  )? counter + 1 : counter; 
@@ -157,6 +163,7 @@ module judge(
                 touchedplayer1_nxt = 0;
                 touchedplayer2_nxt = 0;
                 thirdtouched_nxt=0;
+                whistle_nxt =1;
             end
             ENDGAME:begin            
                 endgame_nxt = 1;
@@ -169,7 +176,8 @@ module judge(
                 flag_point_nxt= flag_point; 
                 endgame_nxt =  endgame; 
                 thirdtouched_nxt=thirdtouched;
-                counter_nxt = counter ;           
+                counter_nxt = counter ;  
+                whistle_nxt = 0;         
             end
          endcase   
     end 
