@@ -85,3 +85,16 @@ set_false_path -from [get_pins {my_MouseCtl/xpos_reg[0]/C}] -to [get_pins {my_bu
 set_false_path -from [get_pins {my_MouseCtl/xpos_reg[8]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][20]/D}]
 set_false_path -from [get_pins {my_MouseCtl/xpos_reg[10]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][22]/D}]
 set_false_path -from [get_pins {my_MouseCtl/xpos_reg[7]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][19]/D}]
+
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[3]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][3]/D}]
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[5]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][5]/D}]
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[8]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][8]/D}]
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[10]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][10]/D}]
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[7]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][7]/D}]
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[6]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][6]/D}]
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[0]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][0]/D}]
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[9]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][9]/D}]
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[2]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][2]/D}]
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[1]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][1]/D}]
+
+set_false_path -from [get_pins {my_MouseCtl/ypos_reg[4]/C}] -to [get_pins {my_buffor_signal_mouse/del_mem_reg[0][4]/D}]

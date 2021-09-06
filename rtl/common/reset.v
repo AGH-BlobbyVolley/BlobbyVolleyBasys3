@@ -8,25 +8,31 @@ module reset (
 	
 	reg [1:0] delay_counter;
 	reg [1:0] delay_counter_nxt;
-	reg delay_rst_nxt;
+	reg delay_int_nxt, delay_int, delay_int2, delay_int3;
 	wire temp;
 	
 	assign temp = ~rst;
 	
+	always @(posedge pclk) begin
+		delay_rst <= delay_int3;
+		delay_int3 <= delay_int2;
+		delay_int2 <= delay_int;
+	end
+
 	always @*
 	    begin
-		if(&delay_counter)            delay_rst_nxt = 0;
-		else if(~temp && ~|delay_counter) delay_rst_nxt = 1;
-	    else                          delay_rst_nxt = delay_rst;
+		if(&delay_counter)            delay_int_nxt = 0;
+		else if(~temp && ~|delay_counter) delay_int_nxt = 1;
+	    else                          delay_int_nxt = delay_int;
 	    end
 	
 	always @(posedge pclk, posedge temp)  begin
         if(temp)	begin
-            delay_rst <= 0;
+            delay_int <= 0;
             delay_counter <= 0;
         end
         else begin
-            delay_rst <= delay_rst_nxt;
+            delay_int <= delay_int_nxt;
             delay_counter <= delay_counter_nxt;
         end
 	end
