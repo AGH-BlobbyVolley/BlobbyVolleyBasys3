@@ -22,7 +22,7 @@ module uart_demux (
               PL1_POSY = 4'h4,
               BALL_POSX = 4'h5,
               BALL_POSY = 4'h6,
-              MATCH_CTRL = 4'h0;
+              MATCH_CTRL = 4'h7;
 
 
 
