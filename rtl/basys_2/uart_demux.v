@@ -14,7 +14,6 @@ module uart_demux (
     output reg [3:0] pl2_score,
     output reg flag_point,
     output reg end_game,
-    output reg reset,
     output reg whistle_play,
     input wire conv8to16valid
   );

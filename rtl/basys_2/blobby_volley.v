@@ -20,7 +20,7 @@ module blobby_volley(
   output wire a_out
   );
 wire clk100MHz;
-wire reset,reset_demux;
+wire reset,reset_delay;
 wire clk65MHz;
 wire locked;
 wire rst_d, reset_delay;
@@ -35,6 +35,8 @@ clock my_clock
  // Clock in ports
   .clk(clk)
  );
+ assign rst_d = (reset||reset_delay)? 1 : 0;
+
  wire [11:0] my_xpos_limit,my_ypos_limit;
  wire my_mouse_left_limit;
  wire [11:0] my_xpos,my_ypos;
