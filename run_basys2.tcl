@@ -68,7 +68,6 @@ read_verilog {
 	rtl/common/_vga_macros.vh
 	rtl/common/player1.v
     rtl/common/Player_2.v
-	rtl/common/buffor_signal_mouse.v
 	rtl/common/ball_rom.v
 	rtl/common/draw_ball.v
 	rtl/common/clk_divider.v
@@ -84,6 +83,9 @@ read_verilog {
     rtl/basys_2/whistle/pwm.v
     rtl/basys_2/whistle/mix.v
     rtl/basys_2/whistle/vol_reg.v
+    rtl/basys_2/uart_top.v
+	rtl/basys_2/game.v
+	rtl/basys_2/mouse_top.v
 }
 
 read_mem {

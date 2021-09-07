@@ -60,7 +60,6 @@ read_verilog {
 	rtl/common/_vga_macros.vh
 	rtl/common/player1.v
 	rtl/common/mouse_limit_player.v
-	rtl/common/buffor_signal_mouse.v
 	rtl/common/ball_rom.v
 	rtl/common/draw_ball.v
 	rtl/basys_1/ball_pos_ctrl.v
@@ -81,6 +80,9 @@ read_verilog {
 	rtl/common/menu.v
 	rtl/common/grey_out.v
 	rtl/common/start_writing.v
+	rtl/basys_1/uart_top.v
+	rtl/basys_1/game.v
+	rtl/basys_1/mouse_top.v
 	
 }
 
