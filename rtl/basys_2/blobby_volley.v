@@ -47,8 +47,6 @@ clock my_clock
  wire mousectl, endgame, last_touch;
  wire whistle_play;
 
- assign rst_d = (reset||reset_delay)? 1 : 0;
-
 reset my_reset 
 (
 	.rst(locked),
@@ -126,7 +124,7 @@ uart_top my_uart_top(
 );
 
 whistle my_whistle(
-  .rst(rst_d),
+  .rst(rst),
   .clk(clk100MHz),
   .start(whistle_play),
   .gain(gain),

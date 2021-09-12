@@ -66,3 +66,13 @@ set_property PHASESHIFT_MODE WAVEFORM [get_cells my_clock/inst/mmcm_adv_inst]
 
 
 
+
+
+
+
+
+
+
+
+
+

@@ -13,6 +13,13 @@ wire clk12M5Hz, clk390kHz;
 wire rst_d, rst_dd, rst_lf, clk100Hz;
 assign gain = 1'b0;
 assign shut_down_n = 1'b1;
+reg rst_int, rst_int2, rst_int3;
+
+always @(posedge clk) begin
+    rst_int3 <= rst;
+    rst_int2 <= rst_int3;
+    rst_int <= rst_int2;
+end
 
 clk_divider #(
     .FREQ(12_500_000),
@@ -20,7 +27,7 @@ clk_divider #(
 )
 gen_clk(
     .clk_in(clk),
-    .rst(rst),
+    .rst(rst_int),
     .clk_div(clk12M5Hz),
     .count(),
     .rst_d(rst_d)

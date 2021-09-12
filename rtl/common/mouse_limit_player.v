@@ -89,7 +89,7 @@ module mouse_limit_player
     end
   end
 
-  assign xpos_int = xpos>12'hF ? xpos : 12'h9;
+  assign xpos_int = xpos>12'hF ? (PLAYER==0 ? {xpos[11], xpos[11:1]} : {xpos[11], xpos[11:1]} + 12'd512) : 12'h9;
 
   always @*
   begin

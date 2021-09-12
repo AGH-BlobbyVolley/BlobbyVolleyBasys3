@@ -5,7 +5,6 @@ module blobby_volley(
   inout ps2_data,
   input wire clk,
   input wire rst,
-  input wire test,
   input wire rx,
   //input wire test,
   output wire vs,
