@@ -1,3 +1,7 @@
+/*--------------------------------------*/
+/*      AUTHOR - Stanisław Klat         */
+/*--------------------------------------*/
+
 `timescale 1ns / 1ps
 
 module uart (
@@ -66,7 +70,7 @@ end
 
   always @*
   begin
-    if(con_broken==1'b1) begin //con_broken_nxt=(din==KEYWORD) ? 1'b0 : 1'b1;
+    if(con_broken==1'b1) begin
 		if(rx_done && data_rx==KEYWORD) con_broken_nxt = 1'b0;
 		else con_broken_nxt = con_broken;
 	end

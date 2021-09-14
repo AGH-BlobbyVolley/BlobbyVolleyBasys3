@@ -1,3 +1,7 @@
+/*--------------------------------------*/
+/*      AUTHOR - Stanislaw Klat         */
+/*--------------------------------------*/
+
 `timescale 1 ns / 1 ps
 
 module ball_pos_ctrl(

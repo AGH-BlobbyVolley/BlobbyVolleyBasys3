@@ -1,24 +1,8 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
-//
-// Create Date: 15.05.2021 12:37:15
-// Design Name:
-// Module Name: mouse_limit_player
-// Project Name:
-// Target Devices:
-// Tool Versions:
-// Description:
-//
-// Dependencies:
-//
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-//
-//////////////////////////////////////////////////////////////////////////////////
+/*--------------------------------------*/
+/*      AUTHOR - Szymon Irla            */
+/*--------------------------------------*/
 
+`timescale 1ns / 1ps
 
 module mouse_limit_player
   #(parameter PLAYER=1'b0)

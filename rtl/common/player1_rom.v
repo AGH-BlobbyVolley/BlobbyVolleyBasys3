@@ -1,6 +1,10 @@
+/*--------------------------------------*/
+/*      AUTHOR - Stanisław Klat         */
+/*--------------------------------------*/
+
 module player1_rom (
     input wire clk,
-    input wire [13:0] address,  // address = {addry[9:0], addrx[9:0]}
+    input wire [13:0] address,
     output reg [3:0] rgb
 );
 

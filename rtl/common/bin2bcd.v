@@ -1,3 +1,7 @@
+/*--------------------------------------*/
+/*      Modified by Szymon Irla         */
+/*--------------------------------------*/
+
 `timescale 1ns / 1ps
 module bin2bcd (
         input  wire [3:0] bin,  // input binary number

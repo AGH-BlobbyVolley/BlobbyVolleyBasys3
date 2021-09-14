@@ -1,3 +1,7 @@
+/*--------------------------------------*/
+/*      AUTHOR - Stanisław Klat         */
+/*--------------------------------------*/
+
 `timescale 1 ns / 1 ps
 
 module blobby_volley(

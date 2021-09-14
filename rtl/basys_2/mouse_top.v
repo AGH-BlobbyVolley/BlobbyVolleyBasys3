@@ -1,3 +1,8 @@
+/*--------------------------------------*/
+/*      AUTHOR - Stanislaw Klat         */
+/*      AUTHOR - Szymon Irla            */
+/*--------------------------------------*/
+
 `timescale 1 ns / 1 ps
 
 module mouse_top(

@@ -1,3 +1,7 @@
+/*--------------------------------------*/
+/*      AUTHOR - Stanislaw Klat         */
+/*--------------------------------------*/
+
 module uart_demux (
     input wire [15:0] data,
     input wire clk,

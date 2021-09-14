@@ -1,3 +1,9 @@
+/*--------------------------------------*/
+/*      AUTHOR - Stanisław Klat         */
+/*--------------------------------------*/
+
+`timescale 1ns / 1ps
+
 module conv8to16bit (
     input wire clk,
     input wire rst,

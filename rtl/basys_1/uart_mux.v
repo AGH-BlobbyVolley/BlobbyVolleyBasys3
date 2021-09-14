@@ -1,3 +1,7 @@
+/*--------------------------------------*/
+/*      AUTHOR - Stanislaw Klat         */
+/*--------------------------------------*/
+
 module uart_mux (
     input wire clk,
     input wire rst,
