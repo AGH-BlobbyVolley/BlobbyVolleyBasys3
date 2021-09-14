@@ -1,7 +1,7 @@
 set project Blobby_volley
 set top_module blobby_volley
 set target xc7a35tcpg236-1
-set bitstream_file build/${project}.runs/impl_1/${top_module}.bit
+set bitstream_file ./../Vivado/Basys_1/${project}.runs/impl_1/${top_module}.bit
 
 proc usage {} {
     puts "usage: vivado -mode tcl -source [info script] -tclargs \[simulation/bitstream/program\]"
@@ -31,8 +31,8 @@ if {[lindex $argv 0] == "program"} {
     
     exit
 } else {
-    file mkdir build
-    create_project ${project} build -part ${target} -force
+    file mkdir ./../Vivado/Basys_1
+    create_project ${project} ./../Vivado/Basys_1 -part ${target} -force
 }
 
 read_xdc {
@@ -83,7 +83,6 @@ read_verilog {
 	rtl/basys_1/uart_top.v
 	rtl/basys_1/game.v
 	rtl/basys_1/mouse_top.v
-	
 }
 
 read_mem {
